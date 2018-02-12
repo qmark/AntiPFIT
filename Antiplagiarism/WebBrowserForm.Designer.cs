@@ -38,24 +38,24 @@
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(1106, 780);
+            this.webBrowser1.Size = new System.Drawing.Size(1216, 695);
             this.webBrowser1.TabIndex = 0;
             // 
             // prevButton
             // 
-            this.prevButton.Location = new System.Drawing.Point(1129, 305);
+            this.prevButton.Location = new System.Drawing.Point(447, 715);
             this.prevButton.Name = "prevButton";
-            this.prevButton.Size = new System.Drawing.Size(75, 23);
+            this.prevButton.Size = new System.Drawing.Size(87, 31);
             this.prevButton.TabIndex = 1;
-            this.prevButton.Text = "Prev";
+            this.prevButton.Text = "Previous";
             this.prevButton.UseVisualStyleBackColor = true;
             this.prevButton.Click += new System.EventHandler(this.prevButton_Click);
             // 
             // nextButton
             // 
-            this.nextButton.Location = new System.Drawing.Point(1129, 406);
+            this.nextButton.Location = new System.Drawing.Point(658, 715);
             this.nextButton.Name = "nextButton";
-            this.nextButton.Size = new System.Drawing.Size(75, 23);
+            this.nextButton.Size = new System.Drawing.Size(90, 31);
             this.nextButton.TabIndex = 2;
             this.nextButton.Text = "Next";
             this.nextButton.UseVisualStyleBackColor = true;
@@ -65,7 +65,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1216, 780);
+            this.ClientSize = new System.Drawing.Size(1216, 756);
             this.Controls.Add(this.nextButton);
             this.Controls.Add(this.prevButton);
             this.Controls.Add(this.webBrowser1);

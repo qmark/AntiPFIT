@@ -24,6 +24,7 @@ namespace Antiplagiarism
 
         public void Navigate(string url)
         {
+            this.Text = url;
             webBrowser1.Navigate(url);
         }
 
@@ -75,17 +76,17 @@ namespace Antiplagiarism
 
         private void prevButton_Click(object sender, EventArgs e)
         {
-            if (_currentWordIndex == 0) return;
+            if (_currentWordIndex > 0)
+                _currentWordIndex--;
 
-            _currentWordIndex--;
             ScrollToCurrentWord();
         }
 
         private void nextButton_Click(object sender, EventArgs e)
         {
-            if (_currentWordIndex == _wordsToHighLight.Count - 1) return;
+            if (_currentWordIndex < _wordsToHighLight.Count - 1)
+                _currentWordIndex++;
 
-            _currentWordIndex++;
             ScrollToCurrentWord();
         }
 

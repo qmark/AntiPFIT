@@ -30,6 +30,8 @@ namespace Antiplagiarism
     {
         private List<string> _wordsFromPic;
 
+        private List<CheckResult> _results;
+
         //private readonly string wordFilePath = "D:\\kurs.docx";
         //private readonly string wordFilePath = "D:\\t633.docx";
         //private readonly string wordFilePath = "D:\\t170.docx";
@@ -58,7 +60,7 @@ namespace Antiplagiarism
         #region Tesseract OCR
         private async void button1_Click(object sender, EventArgs e)
         {
-            button2.Enabled = false;
+            //button2.Enabled = false;
 
             string text = "Text1";
 
@@ -66,7 +68,7 @@ namespace Antiplagiarism
 
             richTextBox1.Text = text;
 
-            button2.Enabled = true;
+            //button2.Enabled = true;
         }
 
         public async Task<string> GetTextFromPic(string testImagePath = "dou.PNG")
@@ -260,23 +262,26 @@ namespace Antiplagiarism
         }
 
         #region WebSites
-        private async void button3_ClickAsync(object sender, EventArgs e)
+        private async Task CheckAllTheShit(string fileName)
         {
             richTextBox1.Text = string.Empty;
             textBox2.Text = string.Empty;
             _progress = 0;
 
-            Stopwatch s = new Stopwatch();
-            s.Start();
+            //Stopwatch s = new Stopwatch();
+            //s.Start();
 
-            var simplifiedText = SimplifiedTextFromFile(wordFilePath);
+            var simplifiedText = SimplifiedTextFromFile(fileName);
 
             var words = WordsFromText(simplifiedText).ToArray();
-            s.Stop();
-            textBox2.Text += $"\tGet text and words: {s.Elapsed}" + Environment.NewLine;
-            s.Restart();
+            //s.Stop();
+            //textBox2.Text += $"\tGet text and words: {s.Elapsed}" + Environment.NewLine;
+            //s.Restart();
 
-            textBox2.Text += $"Words count: {words.Length}" + Environment.NewLine;
+            var wordCount = words.Length;
+            richTextBox1.Text += $"Words count: {wordCount}" + Environment.NewLine;
+            tasksCreatedTextBox.Text = (wordCount - Shingle.Lenght + 1).ToString();
+            progressTextBox.Text = (wordCount - Shingle.Lenght + 1).ToString();
             //ShowStrings(words);
 
             string path = @"D:\urlToWordsIndexes.txt";
@@ -287,50 +292,73 @@ namespace Antiplagiarism
             var orderedUrlToWordsIndexes = urlToWordsIndexes.OrderByDescending(kvp => kvp.Value.Count).ToDictionary(pair => pair.Key, pair => pair.Value);
             var orderedUrls = orderedUrlToWordsIndexes.Keys.ToList();
 
-            s.Stop();
-            textBox2.Text += $"\tGet web sites: {s.Elapsed}" + Environment.NewLine;
+            //s.Stop();
+            //textBox2.Text += $"\tGet web sites: {s.Elapsed}" + Environment.NewLine;
 
             ShowUrlToWordIndexes(orderedUrls, orderedUrlToWordsIndexes);
 
-            s.Restart();
-            var webPagesSimplifiedTexts = await UrlsToSimplifiedTextsAsync(orderedUrls);
-            s.Stop();
-            textBox2.Text += $"\tGet texts from web sites: {s.Elapsed}" + Environment.NewLine;
+            //s.Restart();
+            var urlsCountCap = (int)Math.Ceiling(wordCount * 0.1);
+            var webPagesSimplifiedTexts = await UrlsToSimplifiedTextsAsync(urlsCountCap, orderedUrls);
+            //s.Stop();
+            //textBox2.Text += $"\tGet texts from web sites: {s.Elapsed}" + Environment.NewLine;
 
-            s.Restart();
+            //s.Restart();
             var urlToCommonTextParts = CommonTextParts(orderedUrls, orderedUrlToWordsIndexes, words, webPagesSimplifiedTexts);
-            s.Stop();
-            textBox2.Text += $"\tComparing: {s.Elapsed}" + Environment.NewLine;
+            //s.Stop();
+            //textBox2.Text += $"\tComparing: {s.Elapsed}" + Environment.NewLine;
 
-            richTextBox1.Text += "\tCommon Text Parts:" + Environment.NewLine;
             double originalTextCharactersCount = simplifiedText.RemoveWhiteSpaces().Length;
-            for (int i = 0; i < webPagesSimplifiedTexts.Length; i++)
+            _results = GetResults(orderedUrls, urlsCountCap, urlToCommonTextParts, originalTextCharactersCount);
+
+            var orderedResults = _results.OrderByDescending(res => res.CharactersPercentage).ToList();
+
+            for (int i = 0; i < orderedResults.Count; i++)
             {
-                richTextBox1.Text += orderedUrls[i];
-                richTextBox1.Text += Environment.NewLine;
+                textBox2.Text += orderedResults[i].Url;
+                textBox2.Text += Environment.NewLine;
 
-                WebBrowserForm webBrowserForm = new WebBrowserForm();
-                webBrowserForm.Navigate(orderedUrls[i]);
-                webBrowserForm.Show();
+                textBox2.Text += String.Format("{0:P2} text found", orderedResults[i].CharactersPercentage);
+                textBox2.Text += Environment.NewLine;
 
-                string commonText = string.Empty;
-                foreach (var commonTextPart in urlToCommonTextParts[orderedUrls[i]])
+                foreach (var commonTextPart in orderedResults[i].CommonTextParts)
                 {
-                    var textPartWords = WordsFromText(commonTextPart);
-                    webBrowserForm.Highlight(textPartWords);
-
-                    commonText += commonTextPart;
-                    richTextBox1.Text += commonTextPart;
-                    richTextBox1.Text += Environment.NewLine;
+                    textBox2.Text += commonTextPart;
+                    textBox2.Text += Environment.NewLine;
                 }
 
-                var charactersPercentage = commonText.RemoveWhiteSpaces().Length / originalTextCharactersCount;
-                richTextBox1.Text += String.Format("{0:P2}", charactersPercentage);
-                richTextBox1.Text += Environment.NewLine;
-                richTextBox1.Text += Environment.NewLine;
-
-                break;
+                textBox2.Text += Environment.NewLine;
             }
+        }
+
+        private List<CheckResult> GetResults(List<string> orderedUrls, int urlCountCap, Dictionary<string, List<string>> urlToCommonTextParts, double originalTextCharactersCount)
+        {
+            List<CheckResult> results = new List<CheckResult>();
+            for (int i = 0; i < urlCountCap; i++)
+            {
+                CheckResult result = new CheckResult();
+                result.Url = orderedUrls[i];
+
+                //WebBrowserForm webBrowserForm = new WebBrowserForm();
+                //webBrowserForm.Navigate(orderedUrls[i]);
+                //webBrowserForm.Show();
+
+                result.CommonTextParts = urlToCommonTextParts[orderedUrls[i]];
+
+                string commonText = string.Empty;
+                foreach (var commonTextPart in result.CommonTextParts)
+                {
+                    //var textPartWords = WordsFromText(commonTextPart);
+                    //webBrowserForm.Highlight(textPartWords);
+
+                    commonText += commonTextPart;
+                }
+
+                result.CharactersPercentage = commonText.RemoveWhiteSpaces().Length / originalTextCharactersCount;
+
+                results.Add(result);
+            }
+            return results;
         }
 
         private Dictionary<string, List<int>> WebSitesFromWordsParallel(string[] words)
@@ -435,7 +463,7 @@ namespace Antiplagiarism
 
         private void ShowUrlToWordIndexes(List<string> urls, Dictionary<string, List<int>> urlToWordsIndexes)
         {
-            richTextBox1.Text += "\tUrls And Word Indexes:" + Environment.NewLine;
+            richTextBox1.Text += Environment.NewLine;
             for (int i = 0; i < urls.Count; i++)
             {
                 var wordsIndexes = urlToWordsIndexes[urls[i]];
@@ -457,14 +485,12 @@ namespace Antiplagiarism
             richTextBox1.Text += Environment.NewLine;
         }
 
-        private async Task<string[]> UrlsToSimplifiedTextsAsync(List<string> urls)
+        private async Task<string[]> UrlsToSimplifiedTextsAsync(int urlsCountCap, List<string> urls)
         {
-            // TODO urlsToTextsCount
-            int urlsToTextsCount = 5;
+            int urlsToTextsCount = urlsCountCap;
             string[] webPagesTexts = new string[urlsToTextsCount];
             for (int i = 0; i < urlsToTextsCount; i++)
             {
-                //webPagesTexts[i] = await HtmlToText(urls[i]);
                 webPagesTexts[i] = SimplifyText(await HtmlToText(urls[i]));
             }
             return webPagesTexts;
@@ -625,6 +651,39 @@ namespace Antiplagiarism
             }
         }
         #endregion
+
+        private void textBox2_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            WebBrowserForm webBrowserForm = new WebBrowserForm();
+            webBrowserForm.Navigate(e.LinkText);
+            webBrowserForm.Show();
+
+            var result = _results.Find(r => r.Url == e.LinkText);
+
+            string commonText = string.Empty;
+            foreach (var commonTextPart in result.CommonTextParts)
+            {
+                var textPartWords = WordsFromText(commonTextPart);
+                webBrowserForm.Highlight(textPartWords);
+            }
+        }
+
+        private async void button1_Click_1(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "Text files|*txt;*.docx;*.doc";
+            openFileDialog1.Title = "Select a File to check";
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                await CheckAllTheShit(openFileDialog1.FileName);
+            }
+        }
+
+        private async void button3_ClickAsync(object sender, EventArgs e)
+        {
+            await CheckAllTheShit(wordFilePath);
+        }
 
     }
 }
