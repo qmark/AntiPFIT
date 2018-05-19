@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace Antiplagiarism
+namespace AntiPShared
 {
     public static class UnidiffFormater
     {

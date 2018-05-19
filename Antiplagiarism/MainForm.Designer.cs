@@ -36,7 +36,9 @@
             this.textBox2 = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.LoadFileButton = new System.Windows.Forms.Button();
+            this.HardcodedFileButton = new System.Windows.Forms.Button();
+            this.GoogleSearchButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // progressTextBox
@@ -106,22 +108,44 @@
             this.label4.TabIndex = 13;
             this.label4.Text = "Common text parts:";
             // 
-            // button1
+            // LoadFileButton
             // 
-            this.button1.Location = new System.Drawing.Point(433, 700);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(151, 45);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "Load File";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.LoadFileButton.Location = new System.Drawing.Point(433, 700);
+            this.LoadFileButton.Name = "LoadFileButton";
+            this.LoadFileButton.Size = new System.Drawing.Size(151, 45);
+            this.LoadFileButton.TabIndex = 14;
+            this.LoadFileButton.Text = "Load File";
+            this.LoadFileButton.UseVisualStyleBackColor = true;
+            this.LoadFileButton.Click += new System.EventHandler(this.LoadFileButton_Click);
+            // 
+            // HardcodedFileButton
+            // 
+            this.HardcodedFileButton.Location = new System.Drawing.Point(612, 697);
+            this.HardcodedFileButton.Name = "HardcodedFileButton";
+            this.HardcodedFileButton.Size = new System.Drawing.Size(138, 48);
+            this.HardcodedFileButton.TabIndex = 15;
+            this.HardcodedFileButton.Text = "Hardcoded File";
+            this.HardcodedFileButton.UseVisualStyleBackColor = true;
+            this.HardcodedFileButton.Click += new System.EventHandler(this.HardcodedFileButton_Click);
+            // 
+            // GoogleSearchButton
+            // 
+            this.GoogleSearchButton.Location = new System.Drawing.Point(160, 700);
+            this.GoogleSearchButton.Name = "GoogleSearchButton";
+            this.GoogleSearchButton.Size = new System.Drawing.Size(93, 43);
+            this.GoogleSearchButton.TabIndex = 16;
+            this.GoogleSearchButton.Text = "GSearch";
+            this.GoogleSearchButton.UseVisualStyleBackColor = true;
+            this.GoogleSearchButton.Click += new System.EventHandler(this.GoogleSearchButton_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1036, 757);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.GoogleSearchButton);
+            this.Controls.Add(this.HardcodedFileButton);
+            this.Controls.Add(this.LoadFileButton);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textBox2);
@@ -146,7 +170,9 @@
         private System.Windows.Forms.RichTextBox textBox2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button LoadFileButton;
+        private System.Windows.Forms.Button HardcodedFileButton;
+        private System.Windows.Forms.Button GoogleSearchButton;
     }
 }
 

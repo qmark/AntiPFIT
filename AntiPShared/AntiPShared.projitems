@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>0095a3d6-74f4-4c83-9ade-a3f100ba1171</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>AntiPShared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CheckResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GoogleAPIManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logic.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OCR.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SharedExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shingle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StaTaskScheduler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextComparer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextDocumentManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TextManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UnidiffFormater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebManager.cs" />
+  </ItemGroup>
+</Project>

@@ -1,4 +1,4 @@
-﻿namespace Antiplagiarism
+﻿namespace AntiPShared
 {
     public class Shingle
     {
