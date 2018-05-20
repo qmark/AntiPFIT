@@ -4,6 +4,8 @@ namespace AntiPShared
 {
     public class Logic
     {
+
+        //Создает словарь слова - позиции для одного дока
         public static Dictionary<string, List<int>> Indexing(string[] words)
         {
             var wordToPositions = new Dictionary<string, List<int>>();
@@ -23,6 +25,7 @@ namespace AntiPShared
             return wordToPositions;
         }
 
+        //для гугл поиска(общие части, проценты)
         public static List<CheckResult> GetCheckResults(List<string> orderedUrls, int urlCountCap, Dictionary<string, List<string>> urlToCommonTextParts, double originalTextCharactersCount)
         {
             List<CheckResult> results = new List<CheckResult>();
@@ -46,6 +49,7 @@ namespace AntiPShared
             return results;
         }
 
+        //список шинглов
         public static List<string> WordsIndexesToShingleTexts(string[] words, List<int> wordsIndexes)
         {
             List<string> shingleTexts = new List<string>

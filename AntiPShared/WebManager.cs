@@ -102,9 +102,9 @@ namespace AntiPShared
             var nodes = doc1.DocumentNode.SelectNodes("//a").Where(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "resultTitle");
             foreach (var node in nodes)
             {
-                string resultLink = HttpUtility.UrlDecode(HttpUtility.UrlDecode(HttpUtility.UrlDecode(node.Attributes["href"].Value)));
-                String result = resultLink.Substring(resultLink.IndexOf("&ru=") + "&ru=".Length, resultLink.LastIndexOf("&du") - resultLink.IndexOf("&ru=") - "&ru=".Length);
-                links.Add(result);
+                //string resultLink = HttpUtility.UrlDecode(HttpUtility.UrlDecode(HttpUtility.UrlDecode(node.Attributes["href"].Value)));
+                //String result = resultLink.Substring(resultLink.IndexOf("&ru=") + "&ru=".Length, resultLink.LastIndexOf("&du") - resultLink.IndexOf("&ru=") - "&ru=".Length);
+                //links.Add(result);
             }
 
             return links;
