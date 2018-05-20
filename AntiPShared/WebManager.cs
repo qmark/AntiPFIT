@@ -13,14 +13,8 @@ namespace AntiPShared
 {
     public class WebManager
     {
-        public static Dictionary<string, List<int>> WebSitesFromWordsParallel(string[] words)
+        public static Dictionary<string, List<int>> WebSitesFromWordsParallel(List<Shingle> shingles)
         {
-            var shingles = new List<Shingle>();
-            for (int i = 0; i <= words.Length - Shingle.Lenght; i++)
-            {
-                shingles.Add(new Shingle(words, i));
-            }
-
             var staScheduler = new StaTaskScheduler(numberOfThreads: 1); // МЕДЛЕННО, НО ДОЛЬШЕ БЕЗ КАПЧИ
             //var staScheduler = new StaTaskScheduler(numberOfThreads: shingles.Count); // (В Ж)БАН ПРИЛЕТАЕТ СРАЗУ ЖЕ
             var tasks = new Task<(int, List<string>)>[shingles.Count];
