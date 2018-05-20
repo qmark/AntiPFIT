@@ -28,10 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.progressTextBox = new System.Windows.Forms.TextBox();
-            this.tasksCreatedTextBox = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.textBox2 = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -39,39 +35,8 @@
             this.LoadFileButton = new System.Windows.Forms.Button();
             this.HardcodedFileButton = new System.Windows.Forms.Button();
             this.GoogleSearchButton = new System.Windows.Forms.Button();
+            this.QueryTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
-            // 
-            // progressTextBox
-            // 
-            this.progressTextBox.Location = new System.Drawing.Point(973, 731);
-            this.progressTextBox.Name = "progressTextBox";
-            this.progressTextBox.Size = new System.Drawing.Size(51, 22);
-            this.progressTextBox.TabIndex = 5;
-            // 
-            // tasksCreatedTextBox
-            // 
-            this.tasksCreatedTextBox.Location = new System.Drawing.Point(973, 700);
-            this.tasksCreatedTextBox.Name = "tasksCreatedTextBox";
-            this.tasksCreatedTextBox.Size = new System.Drawing.Size(51, 22);
-            this.tasksCreatedTextBox.TabIndex = 6;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(863, 703);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 17);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "tasks created";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(863, 731);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(101, 17);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "tasks progress";
             // 
             // richTextBox1
             // 
@@ -95,22 +60,22 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(35, 12);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(103, 17);
+            this.label3.Size = new System.Drawing.Size(134, 17);
             this.label3.TabIndex = 12;
-            this.label3.Text = "Search results:";
+            this.label3.Text = "Web search results:";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(552, 12);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(129, 17);
+            this.label4.Size = new System.Drawing.Size(156, 17);
             this.label4.TabIndex = 13;
-            this.label4.Text = "Common text parts:";
+            this.label4.Text = "Urls common text parts:";
             // 
             // LoadFileButton
             // 
-            this.LoadFileButton.Location = new System.Drawing.Point(433, 700);
+            this.LoadFileButton.Location = new System.Drawing.Point(441, 689);
             this.LoadFileButton.Name = "LoadFileButton";
             this.LoadFileButton.Size = new System.Drawing.Size(151, 45);
             this.LoadFileButton.TabIndex = 14;
@@ -120,9 +85,9 @@
             // 
             // HardcodedFileButton
             // 
-            this.HardcodedFileButton.Location = new System.Drawing.Point(612, 697);
+            this.HardcodedFileButton.Location = new System.Drawing.Point(457, 740);
             this.HardcodedFileButton.Name = "HardcodedFileButton";
-            this.HardcodedFileButton.Size = new System.Drawing.Size(138, 48);
+            this.HardcodedFileButton.Size = new System.Drawing.Size(120, 26);
             this.HardcodedFileButton.TabIndex = 15;
             this.HardcodedFileButton.Text = "Hardcoded File";
             this.HardcodedFileButton.UseVisualStyleBackColor = true;
@@ -130,19 +95,28 @@
             // 
             // GoogleSearchButton
             // 
-            this.GoogleSearchButton.Location = new System.Drawing.Point(160, 700);
+            this.GoogleSearchButton.Location = new System.Drawing.Point(875, 699);
             this.GoogleSearchButton.Name = "GoogleSearchButton";
-            this.GoogleSearchButton.Size = new System.Drawing.Size(93, 43);
+            this.GoogleSearchButton.Size = new System.Drawing.Size(93, 25);
             this.GoogleSearchButton.TabIndex = 16;
             this.GoogleSearchButton.Text = "GSearch";
             this.GoogleSearchButton.UseVisualStyleBackColor = true;
             this.GoogleSearchButton.Click += new System.EventHandler(this.GoogleSearchButton_Click);
             // 
+            // QueryTextBox
+            // 
+            this.QueryTextBox.Location = new System.Drawing.Point(756, 700);
+            this.QueryTextBox.Name = "QueryTextBox";
+            this.QueryTextBox.Size = new System.Drawing.Size(100, 22);
+            this.QueryTextBox.TabIndex = 17;
+            this.QueryTextBox.Text = "TheFlow";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1036, 757);
+            this.ClientSize = new System.Drawing.Size(1038, 787);
+            this.Controls.Add(this.QueryTextBox);
             this.Controls.Add(this.GoogleSearchButton);
             this.Controls.Add(this.HardcodedFileButton);
             this.Controls.Add(this.LoadFileButton);
@@ -150,10 +124,6 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.richTextBox1);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.tasksCreatedTextBox);
-            this.Controls.Add(this.progressTextBox);
             this.Name = "MainForm";
             this.Text = "AntiPlagiarism";
             this.ResumeLayout(false);
@@ -162,10 +132,6 @@
         }
 
         #endregion
-        private System.Windows.Forms.TextBox progressTextBox;
-        private System.Windows.Forms.TextBox tasksCreatedTextBox;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.RichTextBox textBox2;
         private System.Windows.Forms.Label label3;
@@ -173,6 +139,7 @@
         private System.Windows.Forms.Button LoadFileButton;
         private System.Windows.Forms.Button HardcodedFileButton;
         private System.Windows.Forms.Button GoogleSearchButton;
+        private System.Windows.Forms.TextBox QueryTextBox;
     }
 }
 

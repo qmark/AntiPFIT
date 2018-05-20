@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AntiPShared
 {
@@ -17,6 +19,25 @@ namespace AntiPShared
                 else
                 {
                     wordToPositions.Add(words[position], new List<int> { position });
+                }
+            }
+
+            return wordToPositions;
+        }
+
+        public static Dictionary<string, string> IndexingForDB(string[] words)
+        {
+            var wordToPositions = new Dictionary<string, string>();
+
+            for (int position = 0; position < words.Length; position++)
+            {
+                if (wordToPositions.ContainsKey(words[position]))
+                {
+                    wordToPositions[words[position]] += $",{position}";
+                }
+                else
+                {
+                    wordToPositions.Add(words[position], position.ToString());
                 }
             }
 
@@ -69,6 +90,48 @@ namespace AntiPShared
                 }
             }
             return shingleTexts;
+        }
+
+        public static Dictionary<int, List<int>> FindPlagiarism(Dictionary<int, List<List<int>>> documentIdsToWordPositions)
+        {
+            const int MagicDistanceBetweenIndexes = 3;
+
+            // documentID to words' indexes
+            Dictionary<int, List<int>> plagiarism = new Dictionary<int, List<int>>();
+
+            foreach (var kvp in documentIdsToWordPositions)
+            {
+                for (int firstWordPosition = 0; firstWordPosition < kvp.Value[0].Count; firstWordPosition++)
+                {
+                    List<int> wordsPositons = new List<int>
+                    {
+                        kvp.Value[0][firstWordPosition]
+                    };
+
+                    bool hasEverything = true;
+                    for (int i = 1; hasEverything && i < kvp.Value.Count; i++)
+                    {
+                        int wordIndexOnDistance = kvp.Value[i].Find(item => Math.Abs(item - wordsPositons[i - 1]) < MagicDistanceBetweenIndexes);
+
+                        if (wordIndexOnDistance != 0)
+                        {
+                            wordsPositons.Add(wordIndexOnDistance);
+                        }
+                        else
+                        {
+                            hasEverything = false;
+                            break;
+                        }
+                    }
+
+                    if (hasEverything)
+                    {
+                        plagiarism.Add(kvp.Key, wordsPositons);
+                    }
+                }
+            }
+
+            return plagiarism;
         }
 
     }

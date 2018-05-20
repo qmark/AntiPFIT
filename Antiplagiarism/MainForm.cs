@@ -57,7 +57,7 @@ namespace Antiplagiarism
 
         private async void GoogleSearchButton_Click(object sender, EventArgs e)
         {
-            string query = "The Flow";
+            string query = QueryTextBox.Text;
 
             await Task.Run(async () =>
             {
@@ -153,16 +153,16 @@ namespace Antiplagiarism
 
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                await CheckAllTheShit(openFileDialog1.FileName);
+                await SearchForPlagiarismInWeb(openFileDialog1.FileName);
             }
         }
 
         private async void HardcodedFileButton_Click(object sender, EventArgs e)
         {
-            await CheckAllTheShit(wordFilePath);
+            await SearchForPlagiarismLocally(wordFilePath);
         }
 
-        private async Task CheckAllTheShit(string fileName)
+        private async Task SearchForPlagiarismInWeb(string fileName)
         {
             richTextBox1.Text = string.Empty;
             textBox2.Text = string.Empty;
@@ -177,26 +177,12 @@ namespace Antiplagiarism
             //textBox2.Text += $"\tGet text and words: {s.Elapsed}" + Environment.NewLine;
             //s.Restart();
 
-            //var wordToPositions = Logic.Indexing(words);
-            //foreach (var kvp in wordToPositions)
-            //{
-            //    richTextBox1.Text += kvp.Key + " : ";
-            //    foreach (var item in kvp.Value)
-            //    {
-            //        richTextBox1.Text += item + ", ";
-            //    }
-            //    richTextBox1.Text += Environment.NewLine;
-            //}
-            //richTextBox1.Text += Environment.NewLine;
-            //richTextBox1.Text += Environment.NewLine;
-
             var wordCount = words.Length;
             richTextBox1.Text += $"Words count: {wordCount}" + Environment.NewLine;
-            tasksCreatedTextBox.Text = (wordCount - Shingle.Lenght + 1).ToString();
-            progressTextBox.Text = (wordCount - Shingle.Lenght + 1).ToString();
 
             string path = @"D:\urlToWordsIndexes.txt";
-            //var urlToWordsIndexes = WebManager.WebSitesFromWordsParallel(words);
+            //var shingles = Shingle.ShinglesFromWords(words);
+            //var urlToWordsIndexes = WebManager.WebSitesFromWordsParallel(shingles);
             //File.WriteAllText(path, JsonConvert.SerializeObject(urlToWordsIndexes));
             var urlToWordsIndexes = JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(File.ReadAllText(path));
 
@@ -238,6 +224,85 @@ namespace Antiplagiarism
                     textBox2.Text += Environment.NewLine;
                 }
 
+                textBox2.Text += Environment.NewLine;
+            }
+        }
+
+        private async Task SearchForPlagiarismLocally(string fileName)
+        {
+            richTextBox1.Text = string.Empty;
+            textBox2.Text = string.Empty;
+
+            var simplifiedText = TextDocumentManager.SimplifiedTextFromFile(fileName);
+
+            var words = TextManager.WordsFromText(simplifiedText).ToArray();
+
+            var wordCount = words.Length;
+            richTextBox1.Text += $"Words count: {wordCount}" + Environment.NewLine;
+
+            Dictionary<int, HashSet<int>> plagiarismResult = new Dictionary<int, HashSet<int>>();
+            double vodnost = 0;
+            for (int i = 0; i <= words.Length - Shingle.Lenght; i++)
+            {
+                if (TextManager.StopWords.Contains(words[i]))
+                    vodnost++;
+
+                //
+
+                //GetDocuments(Shingle.ListFromWords(words, i));
+                Dictionary<int, List<List<int>>> documentIdsToWordPositions = new Dictionary<int, List<List<int>>>
+                {
+                    {
+                        1, new List<List<int>>
+                        {
+                            new List<int> { 5 },
+                            new List<int> { 7 },
+                            new List<int> { 9 }
+                        }
+                    },
+                    {
+                        2, new List<List<int>>
+                        {
+                            new List<int> { 5 },
+                            new List<int> { 8 },
+                            new List<int> { 9 }
+                        }
+                    }
+                };
+
+                var plagiarismForShingle = Logic.FindPlagiarism(documentIdsToWordPositions);
+                foreach (var kvp in plagiarismForShingle)
+                {
+                    if (plagiarismResult.TryGetValue(kvp.Key, out HashSet<int> plagiarizedPositions))
+                    {
+                        plagiarizedPositions.UnionWith(kvp.Value);
+                    }
+                    else
+                    {
+                        plagiarismResult.Add(kvp.Key, new HashSet<int>(kvp.Value));
+                    }
+                }
+            }
+
+            for (int i = words.Length - Shingle.Lenght + 1; i < words.Length; i++)
+            {
+                if (TextManager.StopWords.Contains(words[i]))
+                    vodnost++;
+            }
+
+            vodnost /= Convert.ToDouble(words.Length);
+            double toshnotnost = (words.Length - words.Distinct().Count()) / Convert.ToDouble(words.Length);
+
+            textBox2.Text += "Водность текста: " + vodnost + " % " + Environment.NewLine;
+            textBox2.Text += "Тошнотность текста: " + toshnotnost + " % " + Environment.NewLine;
+
+            foreach (var kvp in plagiarismResult)
+            {
+                textBox2.Text += "DocumentID: " + kvp.Key + "\tWord Indexes: ";
+                foreach (var item in kvp.Value)
+                {
+                    textBox2.Text += item + ", ";
+                }
                 textBox2.Text += Environment.NewLine;
             }
         }
