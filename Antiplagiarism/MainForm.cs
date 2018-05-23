@@ -159,7 +159,7 @@ namespace Antiplagiarism
 
         private async void HardcodedFileButton_Click(object sender, EventArgs e)
         {
-            await SearchForPlagiarismLocally(wordFilePath);
+            await SearchForPlagiarismInWeb(wordFilePath);
         }
 
         private async Task SearchForPlagiarismInWeb(string fileName)
@@ -171,6 +171,7 @@ namespace Antiplagiarism
             //s.Start();
 
             var simplifiedText = TextDocumentManager.SimplifiedTextFromFile(fileName);
+            richTextBox1.Text += simplifiedText + Environment.NewLine;
 
             var words = TextManager.WordsFromText(simplifiedText).ToArray();
             //s.Stop();
