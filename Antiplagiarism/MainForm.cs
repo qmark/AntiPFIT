@@ -17,7 +17,7 @@ namespace Antiplagiarism
         //private readonly string wordFilePath = "D:\\t170.docx";
         //private readonly string wordFilePath = "D:\\t21.docx";
         //private readonly string wordFilePath = "D:\\t8.docx";
-        private readonly string wordFilePath = "D:\\tt.docx";
+        private readonly string wordFilePath = @"C:\Users\alex1\Desktop\TEST.docx";
         //private readonly string wordFilePath = "D:\\indexes.docx";
 
         /// 
@@ -233,13 +233,29 @@ namespace Antiplagiarism
         {
             richTextBox1.Text = string.Empty;
             textBox2.Text = string.Empty;
-
+            //richTextBox1.Text += TextDocumentManager.TextFromFile(fileName);
             var simplifiedText = TextDocumentManager.SimplifiedTextFromFile(fileName);
-
+           // textBox2.Text += simplifiedText;
             var words = TextManager.WordsFromText(simplifiedText).ToArray();
-
+           // string str="";
             var wordCount = words.Length;
             richTextBox1.Text += $"Words count: {wordCount}" + Environment.NewLine;
+            //Dictionary<int, List<List<int>>> documentIdsToWordPositions = SQLLoader.GetDocuments(Shingle.ListFromWords(words, i));
+            //foreach (KeyValuePair<int, List<List<int>>> pair in documentIdsToWordPositions)
+            //{
+
+            //    richTextBox1.Text += "Документ - " + pair.Key;
+            //    foreach (List<int> positions in pair.Value)
+            //    {
+            //        foreach (int pos in positions)
+            //        {
+            //            str += Convert.ToString(pos) + " ";
+            //        }
+            //        richTextBox1.Text +="  Позицiї - " + str;
+            //        str = "";
+            //    }
+            //}
+
 
             Dictionary<int, HashSet<int>> plagiarismResult = new Dictionary<int, HashSet<int>>();
             double vodnost = 0;
@@ -250,26 +266,42 @@ namespace Antiplagiarism
 
                 //
 
-                //GetDocuments(Shingle.ListFromWords(words, i));
-                Dictionary<int, List<List<int>>> documentIdsToWordPositions = new Dictionary<int, List<List<int>>>
-                {
-                    {
-                        1, new List<List<int>>
-                        {
-                            new List<int> { 5 },
-                            new List<int> { 7 },
-                            new List<int> { 9 }
-                        }
-                    },
-                    {
-                        2, new List<List<int>>
-                        {
-                            new List<int> { 5 },
-                            new List<int> { 8 },
-                            new List<int> { 9 }
-                        }
-                    }
-                };
+                Dictionary<int, List<List<int>>> documentIdsToWordPositions = SQLLoader.GetDocuments(Shingle.ListFromWords(words, i));
+                //richTextBox1.Text += "Новий шингл" + "\n"+ "\n";
+                //foreach (KeyValuePair<int, List<List<int>>> pair in documentIdsToWordPositions)
+                //{
+
+                //    richTextBox1.Text += "Документ - " + pair.Key + "\n";
+                //    foreach (List<int> positions in pair.Value)
+                //    {
+                //        foreach (int pos in positions)
+                //        {
+                //            str += Convert.ToString(pos) + " ";
+                //        }
+                //        richTextBox1.Text += "  Позицiї - " + str +"\n";
+                //        str = "";
+                //    }
+                //}
+
+                //Dictionary<int, List<List<int>>> documentIdsToWordPositions = new Dictionary<int, List<List<int>>>
+                //{
+                //    {
+                //        1, new List<List<int>>
+                //        {
+                //            new List<int> { 5 },
+                //            new List<int> { 7 },
+                //            new List<int> { 9 }
+                //        }
+                //    },
+                //    {
+                //        2, new List<List<int>>
+                //        {
+                //            new List<int> { 5 },
+                //            new List<int> { 8 },
+                //            new List<int> { 9 }
+                //        }
+                //    }
+                //};
 
                 var plagiarismForShingle = Logic.FindPlagiarism(documentIdsToWordPositions);
                 foreach (var kvp in plagiarismForShingle)
