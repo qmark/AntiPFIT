@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)SharedExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shingle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SqlDbConnection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SQLLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StaTaskScheduler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextDocumentManager.cs" />

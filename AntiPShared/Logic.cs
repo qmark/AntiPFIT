@@ -129,7 +129,14 @@ namespace AntiPShared
 
                     if (hasEverything)
                     {
-                        plagiarism.Add(kvp.Key, wordsPositons);
+                        if (plagiarism.TryGetValue(kvp.Key, out List<int> plagiarizedPositions))
+                        {
+                            plagiarizedPositions.AddRange(wordsPositons);
+                        }
+                        else
+                        {
+                            plagiarism.Add(kvp.Key, wordsPositons);
+                        }
                     }
                 }
             }

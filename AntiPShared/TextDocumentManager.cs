@@ -11,5 +11,12 @@ namespace AntiPShared
 
             return TextManager.SimplifyText(doc.GetText()).Replace("\r\n", " ");
         }
+        public static string TextFromFile(string fileName)
+        {
+            var doc = new Document();
+            doc.LoadFromFile(fileName);
+
+            return doc.GetText();
+        }
     }
 }

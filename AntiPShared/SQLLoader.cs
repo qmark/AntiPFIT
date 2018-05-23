@@ -1,40 +1,17 @@
-using System;
-using System.Data;
-using System.Data.SqlClient;
+ï»¿using System;
 using System.Collections.Generic;
-using AntiPShared;
+using System.Text;
+using System.Data;
 using System.Linq;
-using Spire.Doc;
 
-namespace FilesIndexer
+namespace AntiPShared
 {
-    class Program
+    public class SQLLoader
     {
-        //private void dbconnection()
-        //{
-
-        //    for (int i = 0; i < 100; i++)
-        //    {
-        //        SqlDbConnection SQL = new SqlDbConnection();
-        //        SQL.Procedurename = "readFromTbl";
-        //        SQL.AddParameter("command", "getText");
-        //        SQL.ExecuteObject();
-        //        for (int j = 0; j < SQL.ResultRowAmount; j++)
-        //        {
-        //            textBox2.Text += i + " ";           
-        //                textBox1.Text += SQL.GetFieldByName(j, "text");
-
-        //        }
-
-        //        string ss = "Inverted indexes are the most fundamental and widely used data structures in information retrieval. For each unique word occurring in a document collection, the inverted index indexes which work naturally for strings as";
-        //    }
-
-        //}
-
-        private static Dictionary<int, List<List<int>>> GetDocuments(List<String> input)
+        public static Dictionary<int, List<List<int>>> GetDocuments(List<String> input)
         {
             Dictionary<int, List<List<int>>> result = new Dictionary<int, List<List<int>>>();
-           
+
             SqlDbConnection SQL = new SqlDbConnection();
             SQL.Procedurename = "readFromTbl";
             SQL.AddParameter("command", "getDocuments");
@@ -46,7 +23,7 @@ namespace FilesIndexer
             SQL.ExecuteObject();
             for (int j = 0; j < SQL.ResultRowAmount; j++)
             {
-                
+
                 List<List<int>> PositionsLists = new List<List<int>>();
                 PositionsLists.Add(ParsePositions(SQL.GetFieldByName(j, "FirstList")));
                 PositionsLists.Add(ParsePositions(SQL.GetFieldByName(j, "SecondList")));
@@ -56,12 +33,10 @@ namespace FilesIndexer
                 result.Add(Convert.ToInt32(SQL.GetFieldByName(j, "DocumentId")), PositionsLists);
             }
             return result;
-            
+
         }
-       
-        
-        private static void AddWords(Dictionary<String, String> words, String docName)
-        {        
+        public static void AddWords(Dictionary<String, String> words, String docName)
+        {
             SqlDbConnection SQL = new SqlDbConnection();
             var dt = ConvertToDataTable(words, docName);
             SQL.Procedurename = "readFromTbl";
@@ -71,17 +46,17 @@ namespace FilesIndexer
         }
 
 
-        private static void AddDocument(String name, String text)
+        public static void AddDocument(String name, String text)
         {
             SqlDbConnection SQL = new SqlDbConnection();
             SQL.Procedurename = "readFromTbl";
             SQL.AddParameter("command", "addDoc");
             SQL.AddParameter("name", name);
             SQL.AddParameter("text", text);
-            SQL.ExecuteObject();           
+            SQL.ExecuteObject();
         }
 
-        private static DataTable ConvertToDataTable(Dictionary<string, string> dict, String docName)
+        public static DataTable ConvertToDataTable(Dictionary<string, string> dict, String docName)
         {
             var dt = new DataTable();
             dt.Columns.Add("Word", typeof(string));
@@ -104,47 +79,6 @@ namespace FilesIndexer
             int[] myInts = Array.ConvertAll(input.Split(','), s => int.Parse(s));
             return myInts.OfType<int>().ToList();
         }
-
-
-
-        static void Main(string[] args)
-        {
-            //string nameFile = "LOL"; 
-            //string test = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + nameFile + ".docx");
-            //AddDocument(nameFile, test);
-            //test = TextManager.SimplifyText(test).Replace("\r\n", " ");
-            //AddWords(Logic.IndexingForDB(TextManager.WordsFromText(test).ToArray()), nameFile);
-
-
-
-
-
-            //AddDoc(words, "max");
-
-
-
-            string str = "";
-            List<String> example = new List<string> { "index", "data", "are", "the", "of" };
-            foreach (KeyValuePair<int, List<List<int>>> pair in GetDocuments(example))
-            {
-
-                Console.WriteLine("Äîêóìåíò - " + pair.Key);
-                foreach (List<int> positions in pair.Value)
-                {
-                    foreach (int pos in positions)
-                    {
-                        str += Convert.ToString(pos) + " ";
-                    }
-                    Console.WriteLine("  Ïîçèöi¿ - " + str);
-                    str = "";
-                }
-            }
-
-            Console.ReadKey();
-
-        }
-
-
 
     }
 }

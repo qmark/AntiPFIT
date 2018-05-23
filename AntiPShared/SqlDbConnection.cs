@@ -12,7 +12,7 @@ namespace AntiPShared
     {
         //string connectionString = @"Data Source=SQL5024.SmarterASP.NET;Initial Catalog=DB_9F9885_skdautorework;User Id=DB_9F9885_skdautorework_admin;Password=salo123456;";
         SqlConnection conn;
-        string connectionString = @"Server=DESKTOP-S0C0HQ4;Database=searchdb;Trusted_Connection=True;";
+        string connectionString = @"Data Source = SQL5006.site4now.net; Initial Catalog = DB_9F9885_antip; User Id = DB_9F9885_antip_admin; Password=salo123456;";
         string commandString;
         SqlCommand cmd;
         SqlDataReader reader;
@@ -41,15 +41,14 @@ namespace AntiPShared
         }
         public void AddDict(string key, DataTable value)
         {
-            //cmd = new SqlCommand(procedureName, conn);
-            //cmd.CommandType = CommandType.StoredProcedure;
-            //var param = cmd.Parameters.AddWithValue("myTable", value);
-            //param.SqlDbType = SqlDbType.Structured;
-
             try
             {
                 cmd = new SqlCommand(procedureName, conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+                foreach (var x in parameters)
+                {
+                    cmd.Parameters.Add(new SqlParameter() { ParameterName = "@" + x.Key, Value = x.Value });
+                }
                 var param = cmd.Parameters.AddWithValue("myTable", value);
                 param.SqlDbType = SqlDbType.Structured;
                 conn.Open();
@@ -88,6 +87,7 @@ namespace AntiPShared
             {
                 cmd = new SqlCommand(procedureName, conn);
                 cmd.CommandType = CommandType.StoredProcedure;
+            
                 foreach (var x in parameters)
                 {
                     cmd.Parameters.Add(new SqlParameter() { ParameterName = "@" + x.Key, Value = x.Value });
