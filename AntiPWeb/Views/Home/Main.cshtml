@@ -4,7 +4,50 @@
 }
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
+@using AntiPShared
+@model AntiPShared.PlagiarismInLocalDB
 
 <p>Use this area to provide additional information.</p>
 
+
+
+<form action="" method="post" enctype="multipart/form-data">
+
+    <label for="file">Filename:</label>
+    <input type="file" name="file" id="file" />
+
+    <input type="submit" />
+</form>
+<hr/>
+<div id="inputText"> @{ if (Model != null) { @Model.Text } }</div>
+<hr />
 <button type="button" onclick="location.href='@Url.Action("Test", "Home")'" />
+
+
+
+
+
+<script>
+    var model = @Html.Raw(Json.Encode(Model));
+    function highlight(id) {
+        model.PlagiarismResult[id].forEach(function (item, i, arr) {
+            var inputText = document.getElementById("inputText");
+            var innerHTML = inputText.innerHTML;
+            inputText.innerText.
+            var index = innerHTML.indexOf(text);
+            if (index >= 0) {
+                innerHTML = innerHTML.substring(0, index) + "<span class='highlight'>" + innerHTML.substring(index, index + text.length) + "</span>" + innerHTML.substring(index + text.length);
+                inputText.innerHTML = innerHTML;
+            }
+
+            alert(i + ": " + item + " (массив:" + arr + ")");
+        });
+               
+
+        }
+</script>
+<style>
+    .highlight {
+        background-color: yellow;
+    }
+</style>
