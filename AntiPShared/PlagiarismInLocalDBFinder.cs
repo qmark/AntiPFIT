@@ -14,25 +14,25 @@ namespace AntiPShared
             var words = TextManager.WordsFromText(simplifiedText).ToArray();
             var wordCount = words.Length;
 
-            Dictionary<int, HashSet<int>> plagiarismResult = new Dictionary<int, HashSet<int>>();
+            var plagiarismResult = new Dictionary<int, HashSet<(int DBDocIndex, int initialDocIndex)>>();
             double vodnost = 0;
             for (int i = 0; i <= words.Length - Shingle.Lenght; i++)
             {
                 if (TextManager.StopWords.Contains(words[i]))
                     vodnost++;
 
-                Dictionary<int, List<List<int>>> documentIdToWordsPositions = SQLLoader.GetDocuments(Shingle.ListFromWords(words, i));
+                var documentIdToWordsPositions = SQLLoader.GetDocuments(Shingle.ListFromWords(words, i));
 
-                var plagiarismForShingle = Logic.FindPlagiarism(documentIdToWordsPositions);
+                var plagiarismForShingle = Logic.FindPlagiarism(documentIdToWordsPositions, i);
                 foreach (var kvp in plagiarismForShingle)
                 {
-                    if (plagiarismResult.TryGetValue(kvp.Key, out HashSet<int> plagiarizedPositions))
+                    if (plagiarismResult.TryGetValue(kvp.Key, out HashSet<(int DBDocIndex, int initialDocIndex)> plagiarizedPositions))
                     {
                         plagiarizedPositions.UnionWith(kvp.Value);
                     }
                     else
                     {
-                        plagiarismResult.Add(kvp.Key, new HashSet<int>(kvp.Value));
+                        plagiarismResult.Add(kvp.Key, new HashSet<(int, int)>(kvp.Value));
                     }
                 }
 
