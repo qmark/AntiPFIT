@@ -13,6 +13,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)GoogleAPIManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OCR.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlagiarismInLocalDB.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlagiarismInLocalDBFinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlagiarismInWeb.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlagiarismInWebFinder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SharedExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shingle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SqlDbConnection.cs" />

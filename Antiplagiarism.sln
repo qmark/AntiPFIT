@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Antiplagiarism", "Antiplagiarism\Antiplagiarism.csproj", "{1B98794C-B252-4E27-87FF-048D04CDD99A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiPForms", "Antiplagiarism\AntiPForms.csproj", "{1B98794C-B252-4E27-87FF-048D04CDD99A}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AntiPShared", "AntiPShared\AntiPShared.shproj", "{0095A3D6-74F4-4C83-9ADE-A3F100BA1171}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilesIndexer", "FilesIndexer\FilesIndexer.csproj", "{B7272F98-52F3-4E4B-97E4-5D30856D5B5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntiPWeb", "AntiPWeb\AntiPWeb.csproj", "{57458447-A0A7-435E-BA9C-EFF7DB8F1B30}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -28,6 +30,10 @@ Global
 		{B7272F98-52F3-4E4B-97E4-5D30856D5B5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7272F98-52F3-4E4B-97E4-5D30856D5B5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7272F98-52F3-4E4B-97E4-5D30856D5B5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57458447-A0A7-435E-BA9C-EFF7DB8F1B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57458447-A0A7-435E-BA9C-EFF7DB8F1B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57458447-A0A7-435E-BA9C-EFF7DB8F1B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57458447-A0A7-435E-BA9C-EFF7DB8F1B30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
