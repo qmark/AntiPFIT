@@ -206,7 +206,7 @@ textarea {
 .viewer-list-item_vertical-line{
 
 }*/
-.viewer-list-item.is-source {
+/*.viewer-list-item.is-source {
     padding: 0;
     -ms-flex-direction: column;
     flex-direction: column;
@@ -525,4 +525,4 @@ div {
 
 .button:after, .button:before {
     content: "";
-}
+}*/
