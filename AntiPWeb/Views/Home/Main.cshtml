@@ -28,14 +28,14 @@
 <div class="container">
     <div class="wholebar row">
         <div class="col-sm-8">
-            <p class="leftbar"><div id="inputText">
+            <p class="leftbar" id="inputText">
     @{
         if (Model != null)
         {
             @Html.Raw(@Model.HtmlText)
         }
     }
-</div></p>
+</p>
         </div>
         <div class=" col-sm-4">
             <nav class="leftbar slidemenu">
@@ -58,13 +58,18 @@
                 <div class="slider">
                     <div class="bar"></div>
                 </div>
-                <ul>
-                    @foreach (var x in @Model.PlagiarismDB.DocumentIdToDBWordsIndexes.Keys)
-                    {<li class="option" onclick="myFunction(@x)">
-                         <span class="percent"> @Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes.Values.Count)/Convert.ToDouble(@Model.WordCount)*100 %</span>
-                     <span class="reslink"> @x </span>
-                        </li>}        
-                </ul>
+                @if (Model != null)
+                {
+                    <ul>
+
+                        @foreach (var x in @Model.PlagiarismDB.DocumentIdToDBWordsIndexes.Keys)
+                        {
+                            <li class="option" onclick="myFunction(@x)">
+                                <span class="percent"> @{var lol =Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
+                                <span class="reslink"> @x </span>
+                            </li>}
+                    </ul>
+                }
 
 
 
@@ -129,7 +134,12 @@
 
 <script>
     function myFunction(id) {
-      //  var innerHtml = @Model.PlagiarismDB//
-        document.getElementById("inputText").innerHTML = 
-    }
+
+        var data =  @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model?.PlagiarismDB.DocumentIdToInitialDocumentHtml));
+         if (data != null)
+            {
+                 var innerHtml = data[id];
+                 document.getElementById("inputText").innerHTML = innerHtml;
+            }
+        }
 </script>
