@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AntiPShared
 {
@@ -95,31 +94,35 @@ namespace AntiPShared
             return shingleTexts;
         }
 
-        public static Dictionary<int, List<(int, int)>> FindPlagiarism(Dictionary<int, List<List<int>>> documentIdsToWordPositions, int firstWordInitialDocIndex)
+        public static PlagiarismDB FindPlagiarism(Dictionary<int, List<List<int>>> documentIdToDBDocWordsPositionsForShingle, List<int> initialDocIndexesForShingle)
         {
             const int MagicDistanceBetweenIndexes = 3;
 
-            // documentID to words' indexes
-            var plagiarism = new Dictionary<int, List<(int, int)>>();
+            PlagiarismDB plagiarismDBForShingle = new PlagiarismDB();
 
-            foreach (var kvp in documentIdsToWordPositions)
+            foreach (var kvp in documentIdToDBDocWordsPositionsForShingle)
             {
                 for (int firstWordPosition = 0; firstWordPosition < kvp.Value[0].Count; firstWordPosition++)
                 {
-                    var wordsPositons = new List<(int DBDocIndex, int initialDocIndex)>
+                    var DBWordsIndexes = new List<int>
                     {
-                        (kvp.Value[0][firstWordPosition], firstWordInitialDocIndex)
+                        kvp.Value[0][firstWordPosition]
+                    };
+
+                    var initialDocIndexes = new List<int>
+                    {
+                        initialDocIndexesForShingle[0]
                     };
 
                     bool hasEverything = true;
-                    //                                   kvp.Value.Count == Shingle.Lenght
-                    for (int i = 1; hasEverything && i < kvp.Value.Count; i++)
+                    for (int i = 1; hasEverything && i < Shingle.Lenght; i++)
                     {
-                        int wordIndexOnDistance = kvp.Value[i].Find(item => Math.Abs(item - wordsPositons[i - 1].DBDocIndex) < MagicDistanceBetweenIndexes);
+                        int wordIndexOnDistance = kvp.Value[i].Find(item => Math.Abs(item - DBWordsIndexes[i - 1]) < MagicDistanceBetweenIndexes);
 
                         if (wordIndexOnDistance != 0)
                         {
-                            wordsPositons.Add((wordIndexOnDistance, firstWordInitialDocIndex + i));
+                            DBWordsIndexes.Add(wordIndexOnDistance);
+                            initialDocIndexes.Add(initialDocIndexesForShingle[i]);
                         }
                         else
                         {
@@ -130,19 +133,36 @@ namespace AntiPShared
 
                     if (hasEverything)
                     {
-                        if (plagiarism.TryGetValue(kvp.Key, out List<(int, int)> plagiarizedPositions))
+                        if (plagiarismDBForShingle.DocumentIdToDBWordsIndexes.TryGetValue(kvp.Key, out HashSet<int> DBDocPlagiarizedPositions))
                         {
-                            plagiarizedPositions.AddRange(wordsPositons);
+                            DBDocPlagiarizedPositions.UnionWith(DBWordsIndexes);
+                            plagiarismDBForShingle.DocumentIdToInitialWordsIndexes[kvp.Key].UnionWith(initialDocIndexes);
                         }
                         else
                         {
-                            plagiarism.Add(kvp.Key, wordsPositons);
+                            plagiarismDBForShingle.DocumentIdToDBWordsIndexes.Add(kvp.Key, new HashSet<int>(DBWordsIndexes));
+                            plagiarismDBForShingle.DocumentIdToInitialWordsIndexes.Add(kvp.Key, new HashSet<int>(initialDocIndexes));
+                        }
+
+                        if (plagiarismDBForShingle.InitialWordIndexToDocumentIds.ContainsKey(initialDocIndexesForShingle[0]))
+                        {
+                            for (int i = 0; i < Shingle.Lenght; i++)
+                            {
+                                plagiarismDBForShingle.InitialWordIndexToDocumentIds[initialDocIndexesForShingle[i]].Add(kvp.Key);
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < Shingle.Lenght; i++)
+                            {
+                                plagiarismDBForShingle.InitialWordIndexToDocumentIds.Add(initialDocIndexesForShingle[i], new HashSet<int>() { kvp.Key });
+                            }
                         }
                     }
                 }
             }
 
-            return plagiarism;
+            return plagiarismDBForShingle;
         }
 
     }

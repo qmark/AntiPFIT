@@ -20,6 +20,15 @@
 
     <input type="submit" />
 </form>
+<hr/>
+<div id="inputText">
+    @{
+        if (Model != null)
+        {
+            @Html.Raw(@Model.HtmlText)
+        }
+    }
+</div>
 <hr />
 <div id="inputText">
     @{ if (Model != null)
@@ -89,8 +98,8 @@
 
 
 
-<script>
-    @*var model = @Html.Raw(Json.Encode(Model));
+@*<script>
+    var model = @Html.Raw(Json.Encode(Model));
     function highlight(id) {
         model.PlagiarismResult[id].forEach(function (item, i, arr) {
             var inputText = document.getElementById("inputText");
@@ -112,4 +121,4 @@
     .highlight {
         background-color: yellow;
     }
-</style>
+</style>*@

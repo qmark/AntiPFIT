@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,56 +7,118 @@ namespace AntiPShared
 {
     public class PlagiarismInLocalDBFinder
     {
-        public static async Task<PlagiarismInLocalDB> Find(string text)
+        public static async Task<PlagiarismInLocalDB> Find(string initialText)
         {
-
-            var simplifiedText = TextManager.SimplifyText(text).Replace("\r\n", " "); ;
-            var words = TextManager.WordsFromText(simplifiedText).ToArray();
-            var wordCount = words.Length;
-
-            var plagiarismResult = new Dictionary<int, HashSet<(int DBDocIndex, int initialDocIndex)>>();
-            double vodnost = 0;
-            for (int i = 0; i <= words.Length - Shingle.Lenght; i++)
+            var initialWords = TextManager.WordsFromText(initialText).ToArray();
+            var initialDocIndexToSimplifiedWord = new Dictionary<int, string>();
+            for (int initialDocIndex = 0; initialDocIndex < initialWords.Length; initialDocIndex++)
             {
-                if (TextManager.StopWords.Contains(words[i]))
+                var currentInitialWord = initialWords[initialDocIndex];
+                if (!(currentInitialWord.Length == 1 && char.IsPunctuation(Convert.ToChar(currentInitialWord))))
+                    initialDocIndexToSimplifiedWord.Add(initialDocIndex, TextManager.SimplifyText(currentInitialWord));
+            }
+
+            var initialDocIndexes = initialDocIndexToSimplifiedWord.Keys.ToArray();
+            var simplifiedWords = initialDocIndexToSimplifiedWord.Values.ToArray();
+            var wordCount = simplifiedWords.Length;
+
+            var plagiarismDB = new PlagiarismDB();
+            double vodnost = 0;
+            for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
+            {
+                if (TextManager.StopWords.Contains(simplifiedWords[i]))
                     vodnost++;
 
-                var documentIdToWordsPositions = SQLLoader.GetDocuments(Shingle.ListFromWords(words, i));
+                var documentIdToDBDocWordsPositionsForShingle = SQLLoader.GetDocuments(Shingle.ListFromWords(simplifiedWords, i));
 
-                var plagiarismForShingle = Logic.FindPlagiarism(documentIdToWordsPositions, i);
-                foreach (var kvp in plagiarismForShingle)
+                var initialDocIndexesForShingle = new List<int>();
+                for (int j = 0; j < Shingle.Lenght; j++)
                 {
-                    if (plagiarismResult.TryGetValue(kvp.Key, out HashSet<(int DBDocIndex, int initialDocIndex)> plagiarizedPositions))
+                    initialDocIndexesForShingle.Add(initialDocIndexes[i + j]);
+                }
+
+                var plagiarismDBForShingle = Logic.FindPlagiarism(documentIdToDBDocWordsPositionsForShingle, initialDocIndexesForShingle);
+                foreach (var kvp in plagiarismDBForShingle.DocumentIdToDBWordsIndexes)
+                {
+                    if (plagiarismDB.DocumentIdToDBWordsIndexes.TryGetValue(kvp.Key, out HashSet<int> plagiarizedDBWordsIndexes))
                     {
-                        plagiarizedPositions.UnionWith(kvp.Value);
+                        plagiarizedDBWordsIndexes.UnionWith(kvp.Value);
+                        plagiarismDB.DocumentIdToInitialWordsIndexes[kvp.Key].UnionWith(plagiarismDBForShingle.DocumentIdToInitialWordsIndexes[kvp.Key]);
                     }
                     else
                     {
-                        plagiarismResult.Add(kvp.Key, new HashSet<(int, int)>(kvp.Value));
+                        plagiarismDB.DocumentIdToDBWordsIndexes.Add(kvp.Key, kvp.Value);
+                        plagiarismDB.DocumentIdToInitialWordsIndexes.Add(kvp.Key, plagiarismDBForShingle.DocumentIdToInitialWordsIndexes[kvp.Key]);
                     }
                 }
-
-                Console.WriteLine(i);
+                foreach (var kvp in plagiarismDBForShingle.InitialWordIndexToDocumentIds)
+                {
+                    if (plagiarismDB.InitialWordIndexToDocumentIds.TryGetValue(kvp.Key, out HashSet<int> sourceDocumentIds))
+                    {
+                        sourceDocumentIds.UnionWith(kvp.Value);
+                    }
+                    else
+                    {
+                        plagiarismDB.InitialWordIndexToDocumentIds.Add(kvp.Key, kvp.Value);
+                    }
+                }
             }
 
-            for (int i = words.Length - Shingle.Lenght + 1; i < words.Length; i++)
+            for (int i = simplifiedWords.Length - Shingle.Lenght + 1; i < simplifiedWords.Length; i++)
             {
-                if (TextManager.StopWords.Contains(words[i]))
+                if (TextManager.StopWords.Contains(simplifiedWords[i]))
                     vodnost++;
             }
 
-            vodnost /= Convert.ToDouble(words.Length);
-            double toshnotnost = (words.Length - words.Distinct().Count()) / Convert.ToDouble(words.Length);
+            vodnost /= Convert.ToDouble(simplifiedWords.Length);
+            double toshnotnost = (simplifiedWords.Length - simplifiedWords.Distinct().Count()) / Convert.ToDouble(simplifiedWords.Length);
+
+            string htmlText = ComposeHtmlText(initialWords, plagiarismDB);
 
             return new PlagiarismInLocalDB
             {
-                Words = words,
+                InitialWords = initialWords,
+                SimplifiedWords = simplifiedWords,
                 WordCount = wordCount,
-                PlagiarismResult = plagiarismResult,
+                PlagiarismDB = plagiarismDB,
                 Vodnost = vodnost,
                 Toshnotnost = toshnotnost,
-                Text = text
+                HtmlText = htmlText
             };
+        }
+
+        private static string ComposeHtmlText(string[] initialWords, PlagiarismDB plagiarismDB)
+        {
+            bool plagiarizedTagOpened = plagiarismDB.InitialWordIndexToDocumentIds.ContainsKey(0) ? true : false;
+            var openTag = "<span style=\"color: #ff0000\">";
+            var closeTag = "</span>";
+            var htmlText = plagiarizedTagOpened ? openTag : "";
+            for (int initialDocIndex = 0; initialDocIndex < initialWords.Length; initialDocIndex++)
+            {
+                if (plagiarismDB.InitialWordIndexToDocumentIds.ContainsKey(initialDocIndex))
+                {
+                    if (plagiarizedTagOpened)
+                        htmlText += initialWords[initialDocIndex] + " ";
+                    else
+                    {
+                        htmlText += $"{openTag}{initialWords[initialDocIndex]} ";
+                        plagiarizedTagOpened = true;
+                    }
+                }
+                else
+                {
+                    if (plagiarizedTagOpened)
+                    {
+                        htmlText += closeTag + initialWords[initialDocIndex] + " ";
+                        plagiarizedTagOpened = false;
+                    }
+                    else
+                        htmlText += initialWords[initialDocIndex] + " ";
+                }
+            }
+            if (plagiarizedTagOpened)
+                htmlText += closeTag;
+            return htmlText;
         }
     }
 }

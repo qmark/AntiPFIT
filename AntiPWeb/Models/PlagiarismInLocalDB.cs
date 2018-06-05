@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AntiPShared
+﻿namespace AntiPShared
 {
     public class PlagiarismInLocalDB
     {
-        public string[] Words { get; set; }
+        public string[] InitialWords { get; set; }
+        public string[] SimplifiedWords { get; set; }
         public int WordCount { get; set; }
-        public Dictionary<int, HashSet<(int DBDocIndex, int initialDocIndex)>> PlagiarismResult  { get; set; }
+        public PlagiarismDB PlagiarismDB { get; set; }
         public double Vodnost { get; set; }
         public double Toshnotnost { get; set; }
-        public string Text { get; set; }
+        public string HtmlText { get; set; }
     }
 }

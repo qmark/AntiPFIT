@@ -1287,7 +1287,8 @@ namespace AntiPShared
 
         public static string SimplifyText(string text)
         {
-            return new string(text.Replace('-', ' ').Where(c => !char.IsPunctuation(c)).ToArray()).ToLower();
+            return new string(text.Where(c => !(char.IsPunctuation(c) && c != '-')).ToArray()).ToLower();
+            //return new string(text.Replace('-', ' ').Where(c => !char.IsPunctuation(c)).ToArray()).ToLower().Replace("\r\n", " ");
         }
     }
 }
