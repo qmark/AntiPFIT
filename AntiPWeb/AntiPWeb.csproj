@@ -244,6 +244,7 @@
     <Compile Include="Models\GoogleAPIManager.cs" />
     <Compile Include="Models\Logic.cs" />
     <Compile Include="Models\OCR.cs" />
+    <Compile Include="Models\PlagiarismDB.cs" />
     <Compile Include="Models\PlagiarismInLocalDB.cs" />
     <Compile Include="Models\PlagiarismInLocalDBFinder.cs" />
     <Compile Include="Models\PlagiarismInWeb.cs" />

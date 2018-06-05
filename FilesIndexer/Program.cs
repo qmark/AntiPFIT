@@ -1,10 +1,8 @@
-using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Collections.Generic;
 using AntiPShared;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using Spire.Doc;
 
 namespace FilesIndexer
 {

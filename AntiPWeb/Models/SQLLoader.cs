@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
 using System.Linq;
 
@@ -10,6 +9,7 @@ namespace AntiPShared
     {
         public static Dictionary<int, List<List<int>>> GetDocuments(List<String> input)
         {
+            //              List.Count = 5
             Dictionary<int, List<List<int>>> result = new Dictionary<int, List<List<int>>>();
 
             SqlDbConnection SQL = new SqlDbConnection();
@@ -35,6 +35,7 @@ namespace AntiPShared
             return result;
 
         }
+
         public static void AddWords(Dictionary<String, String> words, String docName)
         {
             SqlDbConnection SQL = new SqlDbConnection();
@@ -44,7 +45,6 @@ namespace AntiPShared
             SQL.AddParameter("name", docName);
             SQL.AddDict("go", dt);
         }
-
 
         public static void AddDocument(String name, String text)
         {
@@ -72,7 +72,6 @@ namespace AntiPShared
             }
             return dt;
         }
-
 
         public static List<int> ParsePositions(String input)
         {

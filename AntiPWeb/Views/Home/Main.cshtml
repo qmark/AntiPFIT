@@ -19,15 +19,21 @@
     <input type="submit" />
 </form>
 <hr/>
-<div id="inputText"> @{ if (Model != null) { @Model.Text } }</div>
+<div id="inputText">
+    @{
+        if (Model != null)
+        {
+            @Html.Raw(@Model.HtmlText)
+        }
+    }
+</div>
 <hr />
-<button type="button" onclick="location.href='@Url.Action("Test", "Home")'" />
 
 
 
 
 
-<script>
+@*<script>
     var model = @Html.Raw(Json.Encode(Model));
     function highlight(id) {
         model.PlagiarismResult[id].forEach(function (item, i, arr) {
@@ -50,4 +56,4 @@
     .highlight {
         background-color: yellow;
     }
-</style>
+</style>*@
