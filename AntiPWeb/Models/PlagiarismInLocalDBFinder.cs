@@ -73,7 +73,12 @@ namespace AntiPShared
             vodnost /= Convert.ToDouble(simplifiedWords.Length);
             double toshnotnost = (simplifiedWords.Length - simplifiedWords.Distinct().Count()) / Convert.ToDouble(simplifiedWords.Length);
 
-            string htmlText = ComposeHtmlText(initialWords, plagiarismDB);
+            string htmlText = ComposeHtmlText(initialWords, plagiarismDB.InitialWordIndexToDocumentIds.Keys);
+
+            foreach (var kvp in plagiarismDB.DocumentIdToInitialWordsIndexes)
+            {
+                plagiarismDB.DocumentIdToInitialDocumentHtml.Add(kvp.Key, ComposeHtmlText(initialWords, kvp.Value));
+            }
 
             return new PlagiarismInLocalDB
             {
@@ -87,15 +92,15 @@ namespace AntiPShared
             };
         }
 
-        private static string ComposeHtmlText(string[] initialWords, PlagiarismDB plagiarismDB)
+        private static string ComposeHtmlText(string[] initialWords, IEnumerable<int> plagiarismIndexes)
         {
-            bool plagiarizedTagOpened = plagiarismDB.InitialWordIndexToDocumentIds.ContainsKey(0) ? true : false;
+            bool plagiarizedTagOpened = plagiarismIndexes.Contains(0) ? true : false;
             var openTag = "<span style=\"color: #ff0000\">";
             var closeTag = "</span>";
             var htmlText = plagiarizedTagOpened ? openTag : "";
             for (int initialDocIndex = 0; initialDocIndex < initialWords.Length; initialDocIndex++)
             {
-                if (plagiarismDB.InitialWordIndexToDocumentIds.ContainsKey(initialDocIndex))
+                if (plagiarismIndexes.Contains(initialDocIndex))
                 {
                     if (plagiarizedTagOpened)
                         htmlText += initialWords[initialDocIndex] + " ";

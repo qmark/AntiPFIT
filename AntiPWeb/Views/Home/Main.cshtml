@@ -20,19 +20,14 @@
 
     <input type="submit" />
 </form>
-<hr/>
+<hr />
 <div id="inputText">
     @{
         if (Model != null)
         {
-            @Html.Raw(@Model.HtmlText)
+            @Html.Raw(@Model.PlagiarismDB.DocumentIdToInitialDocumentHtml[1])
         }
     }
-</div>
-<hr />
-<div id="inputText">
-    @{ if (Model != null)
-        { @Model.Text } }
 </div>
 <hr />
 <button type="button" onclick="location.href='@Url.Action("Test", "Home")'"></button>
@@ -62,7 +57,7 @@
                 <div class="slider">
                     <div class="bar"></div>
                 </div>
-               
+
 
                 <div style="height: 110px; left: 0px; position: absolute; top: 190px; width: 100%; padding: 5px 20px;">
 
@@ -99,24 +94,24 @@
 
 
 @*<script>
-    var model = @Html.Raw(Json.Encode(Model));
-    function highlight(id) {
-        model.PlagiarismResult[id].forEach(function (item, i, arr) {
-            var inputText = document.getElementById("inputText");
-            var innerHTML = inputText.innerHTML;
-            inputText.innerText.
-            var index = innerHTML.indexOf(text);
-            if (index >= 0) {
-                innerHTML = innerHTML.substring(0, index) + "<span class='highlight'>" + innerHTML.substring(index, index + text.length) + "</span>" + innerHTML.substring(index + text.length);
-                inputText.innerHTML = innerHTML;
+        var model = @Html.Raw(Json.Encode(Model));
+        function highlight(id) {
+            model.PlagiarismResult[id].forEach(function (item, i, arr) {
+                var inputText = document.getElementById("inputText");
+                var innerHTML = inputText.innerHTML;
+                inputText.innerText.
+                var index = innerHTML.indexOf(text);
+                if (index >= 0) {
+                    innerHTML = innerHTML.substring(0, index) + "<span class='highlight'>" + innerHTML.substring(index, index + text.length) + "</span>" + innerHTML.substring(index + text.length);
+                    inputText.innerHTML = innerHTML;
+                }
+
+                alert(i + ": " + item + " (массив:" + arr + ")");
+            });
+
+
             }
-
-            alert(i + ": " + item + " (массив:" + arr + ")");
-        });
-
-
-        }*@
-</script>
+    </script>
 <style>
     .highlight {
         background-color: yellow;
