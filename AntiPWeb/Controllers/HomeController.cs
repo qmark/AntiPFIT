@@ -56,10 +56,6 @@ namespace AntiPWeb.Controllers
                 
                 var simplifiedText = TextDocumentManager.TextFromFile(path);
                 PlagiarismInLocalDB result = await PlagiarismInLocalDBFinder.Find(simplifiedText);
-
-              
-                
-               
                 return View("Main", result);
             }
             

@@ -9,9 +9,10 @@ namespace AntiPShared
 {
     public class PlagiarismInLocalDBFinder
     {
-        public static async Task<PlagiarismInLocalDB> Find(string simplifiedText)
+        public static async Task<PlagiarismInLocalDB> Find(string text)
         {
 
+            var simplifiedText = TextManager.SimplifyText(text).Replace("\r\n", " "); ;
             var words = TextManager.WordsFromText(simplifiedText).ToArray();
             var wordCount = words.Length;
 
@@ -55,7 +56,8 @@ namespace AntiPShared
                 WordCount = wordCount,
                 PlagiarismResult = plagiarismResult,
                 Vodnost = vodnost,
-                Toshnotnost = toshnotnost
+                Toshnotnost = toshnotnost,
+                Text = text
             };
         }
     }
