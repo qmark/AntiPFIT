@@ -5,7 +5,7 @@
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
 @using AntiPShared
-@model AntiPShared.PlagiarismInLocalDB
+@model AntiPShared.Plagiarism
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 <p>Use this area to provide additional information.</p>
 
@@ -29,13 +29,13 @@
     <div class="wholebar row">
         <div class="col-sm-8">
             <p class="leftbar" id="inputText">
-    @{
-        if (Model != null)
-        {
-            @Html.Raw(@Model.HtmlText)
-        }
-    }
-</p>
+                @{
+                    if (Model != null)
+                    {
+                        @Html.Raw(@Model.AllPlagiarismHtmlText)
+                    }
+                }
+            </p>
         </div>
         <div class=" col-sm-4">
             <nav class="leftbar slidemenu">

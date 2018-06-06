@@ -65,5 +65,25 @@ namespace AntiPShared
             return urlToCommonTextParts;
         }
 
+        public static List<List<int>> FindWordsInIndexedText(List<string> input, Dictionary<string, List<int>> indexedText)
+        {
+            List<List<int>> result = new List<List<int>>();
+
+            bool allFound = true;
+            for (int i = 0; i < input.Count; i++)
+            {
+                if (indexedText.TryGetValue(input[i], out List<int> wordIndexes))
+                {
+                    result.Add(wordIndexes);
+                }
+                else
+                {
+                    allFound = false;
+                }
+            }
+
+            return allFound ? result : new List<List<int>>();
+        }
+
     }
 }

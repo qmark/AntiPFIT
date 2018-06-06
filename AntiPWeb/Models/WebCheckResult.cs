@@ -2,9 +2,8 @@
 
 namespace AntiPShared
 {
-    public class CheckResult
+    public class WebCheckResult
     {
-        public string Url { get; set; }
         public List<string> CommonTextParts { get; set; }
         public double CharactersPercentage { get; set; }
     }

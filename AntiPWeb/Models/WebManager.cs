@@ -12,7 +12,8 @@ namespace AntiPShared
 {
     public class WebManager
     {
-        public static Dictionary<string, List<int>> WebSitesFromWordsParallel(List<Shingle> shingles)
+        #region Urls From Parsing
+        public static Dictionary<string, List<int>> UrlsFromParsing(List<Shingle> shingles)
         {
             var staScheduler = new StaTaskScheduler(numberOfThreads: 1); // МЕДЛЕННО, НО ДОЛЬШЕ БЕЗ КАПЧИ
             //var staScheduler = new StaTaskScheduler(numberOfThreads: shingles.Count); // (В Ж)БАН ПРИЛЕТАЕТ СРАЗУ ЖЕ
@@ -40,24 +41,6 @@ namespace AntiPShared
             return urlToWordsIndexes;
         }
 
-        public static void UrlsToDictionaries(List<string> urls, int firstWordIndex, Dictionary<string, List<int>> urlToWordsIndexes)
-        {
-            for (int j = 0; j < urls.Count; j++)
-            {
-                var currentUrl = urls[j];
-
-                //if (urlToWordsIndexes.TryGetValue(currentUrl, out int doesntmatter))
-                if (urlToWordsIndexes.ContainsKey(currentUrl))
-                {
-                    urlToWordsIndexes[currentUrl].Add(firstWordIndex);
-                }
-                else
-                {
-                    urlToWordsIndexes.Add(currentUrl, new List<int>() { firstWordIndex });
-                }
-            }
-        }
-
         public static (int firstWordIndex, List<string> urls) FirstWordIndexAndUrls(Shingle shingle)
         {
             Console.WriteLine(shingle.Query);
@@ -69,6 +52,7 @@ namespace AntiPShared
             return (shingle.FirstWordIndex, links);
         }
 
+        #region Parsing Search Engines results
         public static List<string> UrlsFromGoogle(string query)
         {
             List<string> links = new List<string>();
@@ -124,14 +108,72 @@ namespace AntiPShared
 
             return links;
         }
+        #endregion
+        #endregion
 
-        public static async Task<string[]> UrlsToSimplifiedTextsAsync(int urlsCountCap, List<string> urls)
+        #region Urls From API
+        public static Dictionary<string, List<int>> UrlToShingleIndexesFromAPI(List<Shingle> shingles)
         {
-            int urlsToTextsCount = urlsCountCap;
-            string[] webPagesTexts = new string[urlsToTextsCount];
-            for (int i = 0; i < urlsToTextsCount; i++)
+            var tasks = new Task<(int, List<string>)>[shingles.Count];
+            for (int i = 0; i < shingles.Count; i++)
+            {
+                int j = i;
+                tasks[j] = Task<(int, List<string>)>.Factory.StartNew(() => FirstWordIndexAndUrlsAPI(shingles[j]));
+            }
+
+            Task.WaitAll(tasks);
+
+            var urlToWordsIndexes = new Dictionary<string, List<int>>();
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                var (FirstWordIndex, Urls) = tasks[i].Result;
+
+                UrlsToDictionaries(Urls, FirstWordIndex, urlToWordsIndexes);
+            }
+            return urlToWordsIndexes;
+        }
+
+        public static (int firstWordIndex, List<string> urls) FirstWordIndexAndUrlsAPI(Shingle shingle)
+        {
+            var urls = GoogleAPIManager.GetGoogleSearchResultsUrls(shingle.Query);
+
+            return (shingle.FirstWordIndex, urls);
+        }
+        #endregion
+
+        public static void UrlsToDictionaries(List<string> urls, int firstWordIndex, Dictionary<string, List<int>> urlToWordsIndexes)
+        {
+            for (int j = 0; j < urls.Count; j++)
+            {
+                var currentUrl = urls[j];
+
+                if (urlToWordsIndexes.ContainsKey(currentUrl))
+                {
+                    urlToWordsIndexes[currentUrl].Add(firstWordIndex);
+                }
+                else
+                {
+                    urlToWordsIndexes.Add(currentUrl, new List<int>() { firstWordIndex });
+                }
+            }
+        }
+
+        public static async Task<string[]> SimplifiedTextsAsync(int urlsCountCap, List<string> urls)
+        {
+            var webPagesTexts = new string[urlsCountCap];
+            for (int i = 0; i < urlsCountCap; i++)
             {
                 webPagesTexts[i] = TextManager.SimplifyText(await HtmlToText(urls[i]));
+            }
+            return webPagesTexts;
+        }
+
+        public static async Task<string[]> TextsAsync(int urlsCountCap, List<string> urls)
+        {
+            var webPagesTexts = new string[urlsCountCap];
+            for (int i = 0; i < urlsCountCap; i++)
+            {
+                webPagesTexts[i] = await HtmlToText(urls[i]);
             }
             return webPagesTexts;
         }

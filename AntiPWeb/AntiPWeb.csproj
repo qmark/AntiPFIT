@@ -240,14 +240,16 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\CheckResult.cs" />
+    <Compile Include="Models\PlagiarismWeb.cs" />
+    <Compile Include="Models\WebCheckResult.cs" />
     <Compile Include="Models\GoogleAPIManager.cs" />
     <Compile Include="Models\Logic.cs" />
     <Compile Include="Models\OCR.cs" />
+    <Compile Include="Models\Plagiarism.cs" />
     <Compile Include="Models\PlagiarismDB.cs" />
-    <Compile Include="Models\PlagiarismInLocalDB.cs" />
+    <Compile Include="Models\PlagiarismInLocalDBResult.cs" />
     <Compile Include="Models\PlagiarismInLocalDBFinder.cs" />
-    <Compile Include="Models\PlagiarismInWeb.cs" />
+    <Compile Include="Models\PlagiarismInWebResult.cs" />
     <Compile Include="Models\PlagiarismInWebFinder.cs" />
     <Compile Include="Models\SharedExtensions.cs" />
     <Compile Include="Models\Shingle.cs" />
