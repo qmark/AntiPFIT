@@ -47,7 +47,7 @@ namespace AntiPWeb.Controllers
                 var initialText = TextDocumentManager.TextFromFile(path);
                 TextManager.PrepareText(initialText, out string[] initialWords, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount);
 
-                var plagiarismInWebResult = await PlagiarismInWebFinder.Find(initialWords, initialDocIndexes, simplifiedWords, wordCount, initialText.RemoveWhiteSpaces().Length);
+                var plagiarismInWebResult = await PlagiarismInWebFinder.Find(Server.MapPath("~/App_Data/uploads"), initialWords, initialDocIndexes, simplifiedWords, wordCount, initialText.RemoveWhiteSpaces().Length);
                 var plagiarismInLocalDBResult = await PlagiarismInLocalDBFinder.Find(initialWords, initialDocIndexes, simplifiedWords);
 
                 var DBPlagiarizedIndexes = plagiarismInLocalDBResult.PlagiarismDB.InitialWordIndexToDocumentIds.Keys.ToList();

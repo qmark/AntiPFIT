@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,11 +9,11 @@ namespace AntiPShared
 {
     public class PlagiarismInWebFinder
     {
-        public static async Task<PlagiarismInWebResult> Find(string[] initialWords, int[] initialDocIndexes, string[] simplifiedWords, int wordCount, double originalTextCharactersCount)
+        public static async Task<PlagiarismInWebResult> Find(string serverMapPath, string[] initialWords, int[] initialDocIndexes, string[] simplifiedWords, int wordCount, double originalTextCharactersCount)
         {
             var plagiarismWeb = new PlagiarismWeb();
-
             Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexes = new Dictionary<string, SortedSet<int>>();
+
             for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
             {
                 var query = Shingle.QueryFromWords(simplifiedWords, i);
@@ -36,6 +38,16 @@ namespace AntiPShared
                 }
             }
 
+            //
+            var serializedGS = JsonConvert.SerializeObject(urlToInitialDocWordsIndexes);
+            var fileName = "serializedGS.txt";
+            var path = Path.Combine(serverMapPath, fileName);
+            //file.SaveAs(path);
+            //File.WriteAllText(path, serializedGS);
+
+            urlToInitialDocWordsIndexes = JsonConvert.DeserializeObject<Dictionary<string, SortedSet<int>>>(File.ReadAllText(path));
+
+            //
             var orderedUrlToInitialDocWordsIndexes = urlToInitialDocWordsIndexes.OrderByDescending(kvp => kvp.Value.Count).ToDictionary(pair => pair.Key, pair => pair.Value.ToList());
             var orderedUrls = orderedUrlToInitialDocWordsIndexes.Keys.ToList();
 
