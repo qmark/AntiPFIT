@@ -12,7 +12,7 @@ namespace AntiPShared
             var plagiarismDB = new PlagiarismDB();
             double vodnost = 0;
 
-            for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
+            for (int i = 0; i < initialDocIndexes.Length - Shingle.Lenght; i++)
             {
                 if (TextManager.StopWords.Contains(simplifiedWords[i]))
                     vodnost++;

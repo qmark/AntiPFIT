@@ -14,35 +14,32 @@ namespace AntiPShared
             var plagiarismWeb = new PlagiarismWeb();
             Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexes = new Dictionary<string, SortedSet<int>>();
 
-            for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
-            {
-                var query = Shingle.QueryFromWords(simplifiedWords, i);
-                var urlsForShingle = GoogleAPIManager.GetGoogleSearchResultsUrls(query);
+            //for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
+            //{
+            //    var query = Shingle.QueryFromWords(simplifiedWords, i);
+            //    var urlsForShingle = GoogleAPIManager.GetGoogleSearchResultsUrls(query);
 
-                var initialDocIndexesForShingle = new SortedSet<int>();
-                for (int j = 0; j < Shingle.Lenght; j++)
-                {
-                    initialDocIndexesForShingle.Add(initialDocIndexes[i + j]);
-                }
+            //    var initialDocIndexesForShingle = new SortedSet<int>();
+            //    for (int j = 0; j < Shingle.Lenght; j++)
+            //    {
+            //        initialDocIndexesForShingle.Add(initialDocIndexes[i + j]);
+            //    }
 
-                for (int k = 0; k < urlsForShingle.Count; k++)
-                {
-                    if (urlToInitialDocWordsIndexes.TryGetValue(urlsForShingle[k], out SortedSet<int> initialDocWordsIndexes))
-                    {
-                        initialDocWordsIndexes.UnionWith(initialDocIndexesForShingle);
-                    }
-                    else
-                    {
-                        urlToInitialDocWordsIndexes.Add(urlsForShingle[k], initialDocIndexesForShingle);
-                    }
-                }
-            }
-
-            //
-            var serializedGS = JsonConvert.SerializeObject(urlToInitialDocWordsIndexes);
+            //    for (int k = 0; k < urlsForShingle.Count; k++)
+            //    {
+            //        if (urlToInitialDocWordsIndexes.TryGetValue(urlsForShingle[k], out SortedSet<int> initialDocWordsIndexes))
+            //        {
+            //            initialDocWordsIndexes.UnionWith(initialDocIndexesForShingle);
+            //        }
+            //        else
+            //        {
+            //            urlToInitialDocWordsIndexes.Add(urlsForShingle[k], initialDocIndexesForShingle);
+            //        }
+            //    }
+            //}
             var fileName = "serializedGS.txt";
             var path = Path.Combine(serverMapPath, fileName);
-            //file.SaveAs(path);
+            //var serializedGS = JsonConvert.SerializeObject(urlToInitialDocWordsIndexes);
             //File.WriteAllText(path, serializedGS);
 
             urlToInitialDocWordsIndexes = JsonConvert.DeserializeObject<Dictionary<string, SortedSet<int>>>(File.ReadAllText(path));
@@ -60,7 +57,7 @@ namespace AntiPShared
                 var indexedUrlText = Logic.Indexing(urlSimplifiedWords);
                 var initialIndexesFoundOnUrl = orderedUrlToInitialDocWordsIndexes[orderedUrls[i]];
 
-                for (int j = 0; j <= initialIndexesFoundOnUrl.Count - Shingle.Lenght; j++)
+                for (int j = 0; j < Math.Min(initialIndexesFoundOnUrl.Count, urlSimplifiedWords.Length) - Shingle.Lenght; j++)
                 {
                     var urlTextWordsPositionsForShingle = TextComparer.FindWordsInIndexedText(Shingle.ListFromWords(urlSimplifiedWords, j), indexedUrlText);
 
