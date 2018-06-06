@@ -46,7 +46,7 @@ namespace AntiPWeb.Controllers
             HashSet<int> docIndexes = Session["Doc"+id] as HashSet<int>;
 
 
-            ViewBag.Text = PlagiarismInLocalDBFinder.ComposeHtmlText(TextManager.WordsFromText(SQLLoader.GetDoc(id)).ToArray(), docIndexes);
+            ViewBag.Text = TextManager.ComposeHtmlText(TextManager.WordsFromText(SQLLoader.GetDoc(id)).ToArray(), docIndexes);
             ViewBag.Message = "AntiP Main page.";
 
             return View();
@@ -84,13 +84,13 @@ namespace AntiPWeb.Controllers
                     AllPlagiarismHtmlText = allPlagiarismHtmlText
                 };
 
-                return View("Main", plagiarism);
-                PlagiarismInLocalDB plagiarismInLocalDB = await PlagiarismInLocalDBFinder.Find(initialText);
-                foreach (KeyValuePair<int, HashSet<int>> lists in plagiarismInLocalDB.PlagiarismDB.DocumentIdToDBWordsIndexes)
+               
+               
+                foreach (KeyValuePair<int, HashSet<int>> lists in plagiarismInLocalDBResult.PlagiarismDB.DocumentIdToDBWordsIndexes)
                 {
                     Session["Doc" + lists.Key] = lists.Value;
                 }
-                return View("Main", plagiarismInLocalDB);
+                return View("Main", plagiarism);
             }
 
             return RedirectToAction("Main");
