@@ -1,34 +1,28 @@
 ﻿using GoogleCSE;
-using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AntiPShared
 {
     public class GoogleAPIManager
     {
-        public static async Task<string> GetGoogleSearchResults(string query)
+        public static List<string> GetGoogleSearchResultsUrls(string query, int count = 10, int maxPages = 1)
         {
             string ApiKey = "AIzaSyDAKlpT9R-SmDjfbPZBJtNSv1SE0O_6UtY";
             string SystemID = "011958540907442234339:3amnjvx0hhq";
 
-            string result = $"QUERY: {query}" + Environment.NewLine;
+            var googleSearch = new GoogleSearch(SystemID, ApiKey, hl: "uk", pageSize: count, maxPages: maxPages);
+            var GSResults = googleSearch.Search(query);
 
-            var gs = new GoogleSearch(SystemID, ApiKey, maxPages: 1, pageSize: 10);
+            //System.Diagnostics.Debug.WriteLine($"Query: {query}");
+            //foreach (var res in GSResults)
+            //{
+            //    System.Diagnostics.Debug.WriteLine(res.Title);
+            //    System.Diagnostics.Debug.WriteLine(res.Description);
+            //    System.Diagnostics.Debug.WriteLine("");
+            //}
 
-            var results = gs.Search(query);
-
-            for (int i = 0; i < results.Count; i++)
-            {
-                result += "RESULT: " + i + Environment.NewLine;
-                result += "TITLE: " + results[i].Title + Environment.NewLine;
-                result += "DESC: " + results[i].Description + Environment.NewLine;
-                result += "URL: " + results[i].Url + Environment.NewLine;
-                result += "MIME: " + results[i].Mime + Environment.NewLine;
-                result += Environment.NewLine;
-            }
-
-            return result;
+            return GSResults.Select(result => result.Url).ToList();
         }
-
     }
 }

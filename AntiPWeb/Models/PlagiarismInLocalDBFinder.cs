@@ -7,23 +7,11 @@ namespace AntiPShared
 {
     public class PlagiarismInLocalDBFinder
     {
-        public static async Task<PlagiarismInLocalDB> Find(string initialText)
+        public static async Task<PlagiarismInLocalDBResult> Find(string[] initialWords, int[] initialDocIndexes, string[] simplifiedWords)
         {
-            var initialWords = TextManager.WordsFromText(initialText).ToArray();
-            var initialDocIndexToSimplifiedWord = new Dictionary<int, string>();
-            for (int initialDocIndex = 0; initialDocIndex < initialWords.Length; initialDocIndex++)
-            {
-                var currentInitialWord = initialWords[initialDocIndex];
-                if (!(currentInitialWord.Length == 1 && char.IsPunctuation(Convert.ToChar(currentInitialWord))))
-                    initialDocIndexToSimplifiedWord.Add(initialDocIndex, TextManager.SimplifyText(currentInitialWord));
-            }
-
-            var initialDocIndexes = initialDocIndexToSimplifiedWord.Keys.ToArray();
-            var simplifiedWords = initialDocIndexToSimplifiedWord.Values.ToArray();
-            var wordCount = simplifiedWords.Length;
-
             var plagiarismDB = new PlagiarismDB();
             double vodnost = 0;
+
             for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
             {
                 if (TextManager.StopWords.Contains(simplifiedWords[i]))
@@ -64,6 +52,12 @@ namespace AntiPShared
                 }
             }
 
+            foreach (var kvp in plagiarismDB.DocumentIdToInitialWordsIndexes)
+            {
+                plagiarismDB.DocumentIdToInitialDocumentHtml.Add(kvp.Key, TextManager.ComposeHtmlText(initialWords, kvp.Value));
+            }
+
+            //
             for (int i = simplifiedWords.Length - Shingle.Lenght + 1; i < simplifiedWords.Length; i++)
             {
                 if (TextManager.StopWords.Contains(simplifiedWords[i]))
@@ -73,57 +67,12 @@ namespace AntiPShared
             vodnost /= Convert.ToDouble(simplifiedWords.Length);
             double toshnotnost = (simplifiedWords.Length - simplifiedWords.Distinct().Count()) / Convert.ToDouble(simplifiedWords.Length);
 
-            string htmlText = ComposeHtmlText(initialWords, plagiarismDB.InitialWordIndexToDocumentIds.Keys);
-
-            foreach (var kvp in plagiarismDB.DocumentIdToInitialWordsIndexes)
+            return new PlagiarismInLocalDBResult
             {
-                plagiarismDB.DocumentIdToInitialDocumentHtml.Add(kvp.Key, ComposeHtmlText(initialWords, kvp.Value));
-            }
-
-            return new PlagiarismInLocalDB
-            {
-                InitialWords = initialWords,
-                SimplifiedWords = simplifiedWords,
-                WordCount = wordCount,
-                PlagiarismDB = plagiarismDB,
                 Vodnost = vodnost,
                 Toshnotnost = toshnotnost,
-                HtmlText = htmlText
+                PlagiarismDB = plagiarismDB
             };
-        }
-
-        public static string ComposeHtmlText(string[] initialWords, IEnumerable<int> plagiarismIndexes)
-        {
-            bool plagiarizedTagOpened = plagiarismIndexes.Contains(0) ? true : false;
-            var openTag = "<span style=\"color: #ff0000\">";
-            var closeTag = "</span>";
-            var htmlText = plagiarizedTagOpened ? openTag : "";
-            for (int initialDocIndex = 0; initialDocIndex < initialWords.Length; initialDocIndex++)
-            {
-                if (plagiarismIndexes.Contains(initialDocIndex))
-                {
-                    if (plagiarizedTagOpened)
-                        htmlText += initialWords[initialDocIndex] + " ";
-                    else
-                    {
-                        htmlText += $"{openTag}{initialWords[initialDocIndex]} ";
-                        plagiarizedTagOpened = true;
-                    }
-                }
-                else
-                {
-                    if (plagiarizedTagOpened)
-                    {
-                        htmlText += closeTag + initialWords[initialDocIndex] + " ";
-                        plagiarizedTagOpened = false;
-                    }
-                    else
-                        htmlText += initialWords[initialDocIndex] + " ";
-                }
-            }
-            if (plagiarizedTagOpened)
-                htmlText += closeTag;
-            return htmlText;
         }
     }
 }

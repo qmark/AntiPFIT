@@ -5,7 +5,6 @@ namespace AntiPShared
 {
     public class Logic
     {
-
         //Создает словарь слова - позиции для одного дока
         public static Dictionary<string, List<int>> Indexing(string[] words)
         {
@@ -45,27 +44,28 @@ namespace AntiPShared
             return wordToPositions;
         }
 
-        public static List<CheckResult> GetCheckResults(List<string> orderedUrls, int urlCountCap, Dictionary<string, List<string>> urlToCommonTextParts, double originalTextCharactersCount)
+        public static Dictionary<string, WebCheckResult> GetUrlToWebCheckResults(List<string> orderedUrls, int urlCountCap, Dictionary<string, List<string>> urlToCommonTextParts, double originalTextCharactersCount)
         {
-            List<CheckResult> results = new List<CheckResult>();
+            Dictionary<string, WebCheckResult> urlToWebCheckResults = new Dictionary<string, WebCheckResult>();
+
             for (int i = 0; i < urlCountCap; i++)
             {
-                CheckResult result = new CheckResult();
-                result.Url = orderedUrls[i];
-
-                result.CommonTextParts = urlToCommonTextParts[orderedUrls[i]];
+                WebCheckResult result = new WebCheckResult
+                {
+                    CommonTextParts = urlToCommonTextParts[orderedUrls[i]]
+                };
 
                 string commonText = string.Empty;
                 foreach (var commonTextPart in result.CommonTextParts)
                 {
                     commonText += commonTextPart;
                 }
-
                 result.CharactersPercentage = commonText.RemoveWhiteSpaces().Length / originalTextCharactersCount;
 
-                results.Add(result);
+                urlToWebCheckResults.Add(orderedUrls[i], result);
             }
-            return results;
+
+            return urlToWebCheckResults;
         }
 
         //список шинглов
@@ -94,11 +94,11 @@ namespace AntiPShared
             return shingleTexts;
         }
 
+        private const int MagicDistanceBetweenIndexes = 3;
+
         public static PlagiarismDB FindPlagiarism(Dictionary<int, List<List<int>>> documentIdToDBDocWordsPositionsForShingle, List<int> initialDocIndexesForShingle)
         {
-            const int MagicDistanceBetweenIndexes = 3;
-
-            PlagiarismDB plagiarismDBForShingle = new PlagiarismDB();
+            var plagiarismDBForShingle = new PlagiarismDB();
 
             foreach (var kvp in documentIdToDBDocWordsPositionsForShingle)
             {
@@ -163,6 +163,75 @@ namespace AntiPShared
             }
 
             return plagiarismDBForShingle;
+        }
+
+        public static PlagiarismWeb FindPlagiarism(Dictionary<string, List<List<int>>> urlToWebPageWordsPositionsForShingle, List<int> initialDocIndexesForShingle)
+        {
+            var plagiarismWebForShingle = new PlagiarismWeb();
+
+            foreach (var kvp in urlToWebPageWordsPositionsForShingle)
+            {
+                for (int firstWordPosition = 0; firstWordPosition < kvp.Value[0].Count; firstWordPosition++)
+                {
+                    var webPageWordsIndexes = new List<int>
+                    {
+                        kvp.Value[0][firstWordPosition]
+                    };
+
+                    var initialDocIndexes = new List<int>
+                    {
+                        initialDocIndexesForShingle[0]
+                    };
+
+                    bool hasEverything = true;
+                    for (int i = 1; hasEverything && i < Shingle.Lenght; i++)
+                    {
+                        int wordIndexOnDistance = kvp.Value[i].Find(item => Math.Abs(item - webPageWordsIndexes[i - 1]) < MagicDistanceBetweenIndexes);
+
+                        if (wordIndexOnDistance != 0)
+                        {
+                            webPageWordsIndexes.Add(wordIndexOnDistance);
+                            initialDocIndexes.Add(initialDocIndexesForShingle[i]);
+                        }
+                        else
+                        {
+                            hasEverything = false;
+                            break;
+                        }
+                    }
+
+                    if (hasEverything)
+                    {
+                        if (plagiarismWebForShingle.UrlToWebPageWordsIndexes.TryGetValue(kvp.Key, out HashSet<int> webPagePlagiarizedPositions))
+                        {
+                            webPagePlagiarizedPositions.UnionWith(webPageWordsIndexes);
+                            plagiarismWebForShingle.UrlToInitialWordsIndexes[kvp.Key].UnionWith(initialDocIndexes);
+                        }
+                        else
+                        {
+                            plagiarismWebForShingle.UrlToWebPageWordsIndexes.Add(kvp.Key, new HashSet<int>(webPageWordsIndexes));
+                            plagiarismWebForShingle.UrlToInitialWordsIndexes.Add(kvp.Key, new HashSet<int>(initialDocIndexes));
+                        }
+
+                        if (plagiarismWebForShingle.InitialWordIndexToUrls.ContainsKey(initialDocIndexesForShingle[0]))
+                        {
+                            for (int i = 0; i < Shingle.Lenght; i++)
+                            {
+                                plagiarismWebForShingle.InitialWordIndexToUrls[initialDocIndexesForShingle[i]].Add(kvp.Key);
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < Shingle.Lenght; i++)
+                            {
+                                plagiarismWebForShingle.InitialWordIndexToUrls.Add(initialDocIndexesForShingle[i], new HashSet<string>() { kvp.Key });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return plagiarismWebForShingle;
         }
 
     }

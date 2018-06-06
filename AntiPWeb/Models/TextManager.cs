@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AntiPShared
@@ -1289,6 +1290,56 @@ namespace AntiPShared
         {
             return new string(text.Where(c => !(char.IsPunctuation(c) && c != '-')).ToArray()).ToLower();
             //return new string(text.Replace('-', ' ').Where(c => !char.IsPunctuation(c)).ToArray()).ToLower().Replace("\r\n", " ");
+        }
+
+        public static void PrepareText(string initialText, out string[] initialWords, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount)
+        {
+            initialWords = WordsFromText(initialText).ToArray();
+            var initialDocIndexToSimplifiedWord = new Dictionary<int, string>();
+            for (int initialDocIndex = 0; initialDocIndex < initialWords.Length; initialDocIndex++)
+            {
+                var currentInitialWord = initialWords[initialDocIndex];
+                if (!(currentInitialWord.Length == 1 && char.IsPunctuation(Convert.ToChar(currentInitialWord))))
+                    initialDocIndexToSimplifiedWord.Add(initialDocIndex, SimplifyText(currentInitialWord));
+            }
+
+            initialDocIndexes = initialDocIndexToSimplifiedWord.Keys.ToArray();
+            simplifiedWords = initialDocIndexToSimplifiedWord.Values.ToArray();
+            wordCount = simplifiedWords.Length;
+        }
+
+        public static string ComposeHtmlText(string[] words, IEnumerable<int> plagiarizedWordsIndexes)
+        {
+            bool plagiarizedTagOpened = plagiarizedWordsIndexes.Contains(0) ? true : false;
+            var openTag = "<span style=\"color: #ff0000\">";
+            var closeTag = "</span>";
+            var htmlText = plagiarizedTagOpened ? openTag : "";
+            for (int initialDocIndex = 0; initialDocIndex < words.Length; initialDocIndex++)
+            {
+                if (plagiarizedWordsIndexes.Contains(initialDocIndex))
+                {
+                    if (plagiarizedTagOpened)
+                        htmlText += words[initialDocIndex] + " ";
+                    else
+                    {
+                        htmlText += $"{openTag}{words[initialDocIndex]} ";
+                        plagiarizedTagOpened = true;
+                    }
+                }
+                else
+                {
+                    if (plagiarizedTagOpened)
+                    {
+                        htmlText += closeTag + words[initialDocIndex] + " ";
+                        plagiarizedTagOpened = false;
+                    }
+                    else
+                        htmlText += words[initialDocIndex] + " ";
+                }
+            }
+            if (plagiarizedTagOpened)
+                htmlText += closeTag;
+            return htmlText;
         }
     }
 }
