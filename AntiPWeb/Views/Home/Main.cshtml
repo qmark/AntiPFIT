@@ -64,40 +64,65 @@
 
                         @foreach (var x in @Model.PlagiarismDB.DocumentIdToDBWordsIndexes.Keys)
                         {
-                            <li class="option" onclick="myFunction(@x)">
-                                <span class="percent"> @{var lol =Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
-                                <span class="reslink"> @x </span>
-                            </li>}
+                            <li class="option">
+                                <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
+                                <span class="reslink" onclick="dbHighlight(@x)"> @x </span>
+                                @*<button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>*@
+                                <a href="@Url.Action("Source", "Home", new { id = x })" target="_blank">View Link</a>
+
+                            </li>
+
+                        }
+
+                    </ul>
+
+                    <hr/>
+
+                    <ul>
+
+                        @foreach (var x in @Model.PlagiarismWeb.UrlToWebPageWordsIndexes.Keys)
+                        {
+                            <li class="option">
+                                <span class="percent" onclick="webHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.UrlToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
+                                <span class="reslink" onclick="webHighlight(@x)"> @x </span>
+                                @*<button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>*@
+                                <a href="@Url.Action("Source", "Home", new { id = x })" target="_blank">View Link</a>
+
+                            </li>
+
+                        }
+
                     </ul>
                 }
 
 
 
-                    @*<div style="height: 110px; left: 0px; position: absolute; top: 190px; width: 100%; padding: 5px 20px;">
 
-                <div class="viewer-list-item is-source df aic is-open">
-                    <div class="viewer-list-item_inner">
-                        <span class="viewer-list-item_weight-value">
-                            <!-- react-text: 2628 -->35.27<!-- /react-text -->
-                            <!-- react-text: 2629 -->%<!-- /react-text -->
+                @*<div style="height: 110px; left: 0px; position: absolute; top: 190px; width: 100%; padding: 5px 20px;">
+
+            <div class="viewer-list-item is-source df aic is-open">
+                <div class="viewer-list-item_inner">
+                    <span class="viewer-list-item_weight-value">
+                        <!-- react-text: 2628 -->35.27<!-- /react-text -->
+                        <!-- react-text: 2629 -->%<!-- /react-text -->
+                    </span>
+                    <span class="viewer-list-item_text">
+                        <span class="df aic">
+                            <span class="is-overflow-text">uk.wikipedia.org</span>
                         </span>
-                        <span class="viewer-list-item_text">
-                            <span class="df aic">
-                                <span class="is-overflow-text">uk.wikipedia.org</span>
-                            </span>
-                            <span class="viewer-list-item_full-url is-overflow-text">https://uk.wikipedia.org/wiki/%D0%90%D0%BF%D0%B0%D1%80%D0%B0%D1%82%D0%BD%D0%B5_%D0%B7%D0%B0%D0%B1%D0%B5%D0%B7%D0%BF%D0%B5%D1%87%D0%B5%D0%BD%D0%BD%D1%8F</span>
-                        </span><div class="viewer-list-item_weight-line" style="width: 35.27%;">
-                        </div><div class="viewer-list-item_fade">
+                        <span class="viewer-list-item_full-url is-overflow-text">https://uk.wikipedia.org/wiki/%D0%90%D0%BF%D0%B0%D1%80%D0%B0%D1%82%D0%BD%D0%B5_%D0%B7%D0%B0%D0%B1%D0%B5%D0%B7%D0%BF%D0%B5%D1%87%D0%B5%D0%BD%D0%BD%D1%8F</span>
+                    </span><div class="viewer-list-item_weight-line" style="width: 35.27%;">
+                    </div><div class="viewer-list-item_fade">
 
-                        </div>
                     </div>
-                    <div class="viewer-list-item_button-container">
-                        <a class="viewer-list-item_link" href="" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="viewer-list-item_link-icon"><path fill="none" d="M0 24V0h24v24z"></path><path d="M19.04 4H13a1 1 0 0 0-1 1 1 1 0 0 0 1 1h3.66l-5.37 5.36a1.02 1.02 0 0 0 0 1.42 1 1 0 0 0 1.42 0L18 7.48V11a1 1 0 0 0 1 1 1 1 0 0 0 1-1V5.36c.14-.36.06-.78-.22-1.07-.21-.2-.48-.3-.74-.29zM5 4c.55 0 1 .48 1 1.07v13.86C6 19.52 5.56 20 5 20c-.55 0-1-.48-1-1.07V5.07C4 4.48 4.44 4 5 4zm13 12v3a1 1 0 0 0 1 1 1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1 1 1 0 0 0-1 1z"></path><path d="M5 4h3a1 1 0 0 1 1 1 1 1 0 0 1-1 1H5a1 1 0 0 1-1-1 1 1 0 0 1 1-1zM4 19c0 .56.48 1 1.07 1h13.86c.59 0 1.07-.45 1.07-1 0-.56-.48-1-1.07-1H5.07C4.48 18 4 18.45 4 19z"></path></svg>View source</a>
-                        <span class="viewer-list-item_vertical-line"></span><button type="button" class="button button--white viewer-list-item_button "></button>
-                    </div>
-
                 </div>
-            </div>*@
+                <div class="viewer-list-item_button-container">
+                    <a class="viewer-list-item_link" href="" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="viewer-list-item_link-icon"><path fill="none" d="M0 24V0h24v24z"></path><path d="M19.04 4H13a1 1 0 0 0-1 1 1 1 0 0 0 1 1h3.66l-5.37 5.36a1.02 1.02 0 0 0 0 1.42 1 1 0 0 0 1.42 0L18 7.48V11a1 1 0 0 0 1 1 1 1 0 0 0 1-1V5.36c.14-.36.06-.78-.22-1.07-.21-.2-.48-.3-.74-.29zM5 4c.55 0 1 .48 1 1.07v13.86C6 19.52 5.56 20 5 20c-.55 0-1-.48-1-1.07V5.07C4 4.48 4.44 4 5 4zm13 12v3a1 1 0 0 0 1 1 1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1 1 1 0 0 0-1 1z"></path><path d="M5 4h3a1 1 0 0 1 1 1 1 1 0 0 1-1 1H5a1 1 0 0 1-1-1 1 1 0 0 1 1-1zM4 19c0 .56.48 1 1.07 1h13.86c.59 0 1.07-.45 1.07-1 0-.56-.48-1-1.07-1H5.07C4.48 18 4 18.45 4 19z"></path></svg>View source</a>
+                    <span class="viewer-list-item_vertical-line"></span><button type="button" class="button button--white viewer-list-item_button "></button>
+                </div>
+
+            </div>
+        </div>*@
             </nav>
         </div>
 
@@ -133,13 +158,37 @@
 </style>*@
 
 <script>
-    function myFunction(id) {
+    function dbHighlight(id) {
 
-        var data =  @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model?.PlagiarismDB.DocumentIdToInitialDocumentHtml));
-         if (data != null)
-            {
-                 var innerHtml = data[id];
-                 document.getElementById("inputText").innerHTML = innerHtml;
-            }
+        @{ if (Model == null)
+                {
+                    return;
+                } 
+           }
+
+                var data = @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismDB.DocumentIdToInitialDocumentHtml));
+                if (data != null)
+                {
+                    var innerHtml = data[id];
+                    document.getElementById("inputText").innerHTML = innerHtml;
+                }
+            
+    }
+
+     function webHighlight(id) {
+
+        @{ if (Model == null)
+                {
+                    return;
+                } 
+           }
+
+                var data = @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismWeb.UrlToInitialDocumentHtml));
+                if (data != null)
+                {
+                    var innerHtml = data[id];
+                    document.getElementById("inputText").innerHTML = innerHtml;
+                }
+            
         }
 </script>

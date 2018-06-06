@@ -1,5 +1,4 @@
 ﻿using AntiPShared;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,6 +36,23 @@ namespace AntiPWeb.Controllers
             return View();
         }
 
+        public ActionResult Source(int id)
+        {
+
+            //            plagiarismDB.DocumentIdToDBDocumentHtml.Add(kvp.Key, ComposeHtmlText(initialWords, plagiarismDB.DocumentIdToDBWordsIndexes[kvp.Key]));
+            //            initialWords->documentInDBWords
+            //PlagiarismInLocalDBFinder.ComposeHtmlText
+            //        клик на соурс -> грузим текст из соурса(бд/ урл) -> PlagiarismInLocalDBFinder.ComposeHtmlText(словаСоурса, индексыСловСоурса)->показываем результат как хтмл
+            HashSet<int> docIndexes = Session["Doc"+id] as HashSet<int>;
+
+
+            ViewBag.Text = TextManager.ComposeHtmlText(TextManager.WordsFromText(SQLLoader.GetDoc(id)).ToArray(), docIndexes);
+            ViewBag.Message = "AntiP Main page.";
+
+            return View();
+        }
+
+
         [HttpPost]
         public async Task<ActionResult> Main(HttpPostedFileBase file)
         {
@@ -68,6 +84,12 @@ namespace AntiPWeb.Controllers
                     AllPlagiarismHtmlText = allPlagiarismHtmlText
                 };
 
+               
+               
+                foreach (KeyValuePair<int, HashSet<int>> lists in plagiarismInLocalDBResult.PlagiarismDB.DocumentIdToDBWordsIndexes)
+                {
+                    Session["Doc" + lists.Key] = lists.Value;
+                }
                 return View("Main", plagiarism);
             }
 

@@ -107,36 +107,36 @@ namespace FilesIndexer
 
         static void Main(string[] args)
         {
-            //string nameFile = "LOL"; 
-            //string test = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + nameFile + ".docx");
-            //AddDocument(nameFile, test);
-            //test = TextManager.SimplifyText(test).Replace("\r\n", " ");
-            //AddWords(Logic.IndexingForDB(TextManager.WordsFromText(test).ToArray()), nameFile);
+            string nameFile = "Пар 3-01 Інтеграл Ньютона-Лейбніца";
+            string test = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + nameFile + ".doc");
+            AddDocument(nameFile, test);
+            test = TextManager.SimplifyText(test).Replace("\r\n", " ");
+            AddWords(Logic.IndexingForDB(TextManager.WordsFromText(test).ToArray()), nameFile);
 
 
 
 
 
-            //AddDoc(words, "max");
+            
 
 
 
-            string str = "";
-            List<String> example = new List<string> { "index", "data", "are", "the", "of" };
-            foreach (KeyValuePair<int, List<List<int>>> pair in GetDocuments(example))
-            {
+            //string str = "";
+            //List<String> example = new List<string> { "index", "data", "are", "the", "of" };
+            //foreach (KeyValuePair<int, List<List<int>>> pair in GetDocuments(example))
+            //{
 
-                Console.WriteLine("Документ - " + pair.Key);
-                foreach (List<int> positions in pair.Value)
-                {
-                    foreach (int pos in positions)
-                    {
-                        str += Convert.ToString(pos) + " ";
-                    }
-                    Console.WriteLine("  Позицiї - " + str);
-                    str = "";
-                }
-            }
+            //    Console.WriteLine("Документ - " + pair.Key);
+            //    foreach (List<int> positions in pair.Value)
+            //    {
+            //        foreach (int pos in positions)
+            //        {
+            //            str += Convert.ToString(pos) + " ";
+            //        }
+            //        Console.WriteLine("  Позицiї - " + str);
+            //        str = "";
+            //    }
+            //}
 
             Console.ReadKey();
 
