@@ -92,7 +92,7 @@ namespace AntiPShared
             };
         }
 
-        private static string ComposeHtmlText(string[] initialWords, IEnumerable<int> plagiarismIndexes)
+        public static string ComposeHtmlText(string[] initialWords, IEnumerable<int> plagiarismIndexes)
         {
             bool plagiarizedTagOpened = plagiarismIndexes.Contains(0) ? true : false;
             var openTag = "<span style=\"color: #ff0000\">";

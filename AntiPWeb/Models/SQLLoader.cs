@@ -56,6 +56,18 @@ namespace AntiPShared
             SQL.ExecuteObject();
         }
 
+        public static string GetDoc(int id)
+        {
+            string result; 
+            SqlDbConnection SQL = new SqlDbConnection();
+            SQL.Procedurename = "readFromTbl";
+            SQL.AddParameter("command", "getDoc");
+            SQL.AddParameter("id", Convert.ToString(id));
+            SQL.ExecuteObject();
+            result = SQL.GetFieldByName(0, "textDoc");
+            return result;
+        }
+
         public static DataTable ConvertToDataTable(Dictionary<string, string> dict, String docName)
         {
             var dt = new DataTable();
