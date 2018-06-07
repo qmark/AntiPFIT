@@ -316,7 +316,8 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Main.cshtml" />
-    <Content Include="Views\Home\Source.cshtml" />
+    <Content Include="Views\Home\SourceDB.cshtml" />
+    <Content Include="Views\Home\SourceUrl.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\uploads\" />

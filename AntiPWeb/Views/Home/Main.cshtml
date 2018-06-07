@@ -68,7 +68,7 @@
                                 <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
                                 <span class="reslink" onclick="dbHighlight(@x)"> @x </span>
                                 @*<button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>*@
-                                <a href="@Url.Action("Source", "Home", new { id = x })" target="_blank">View Link</a>
+                                <a href="@Url.Action("SourceDB", "Home", new { id = x })" target="_blank">View Link</a>
 
                             </li>
 
@@ -83,10 +83,10 @@
                         @foreach (var x in @Model.PlagiarismWeb.UrlToWebPageWordsIndexes.Keys)
                         {
                             <li class="option">
-                                <span class="percent" onclick="webHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.UrlToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
-                                <span class="reslink" onclick="webHighlight(@x)"> @x </span>
+                                <span class="percent" onclick="webHighlight('@x')"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.UrlToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol %</span>
+                                <span class="reslink" onclick="webHighlight('@x')"> @x</span>
                                 @*<button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>*@
-                                <a href="@Url.Action("Source", "Home", new { id = x })" target="_blank">View Link</a>
+                                <a href="@Url.Action("SourceUrl", "Home", new { id = @HttpUtility.UrlEncode(x) })" target="_blank">View Link</a>
 
                             </li>
 
@@ -163,7 +163,7 @@
         @{ if (Model == null)
                 {
                     return;
-                } 
+                }
            }
 
                 var data = @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismDB.DocumentIdToInitialDocumentHtml));
@@ -172,9 +172,11 @@
                     var innerHtml = data[id];
                     document.getElementById("inputText").innerHTML = innerHtml;
                 }
-            
-    }
 
+    }
+</script>
+
+    <script>
      function webHighlight(id) {
 
         @{ if (Model == null)

@@ -36,14 +36,31 @@ namespace AntiPWeb.Controllers
             return View();
         }
 
-        public ActionResult Source(int id)
+        public async Task<ActionResult> SourceUrl(string id)
         {
 
             //            plagiarismDB.DocumentIdToDBDocumentHtml.Add(kvp.Key, ComposeHtmlText(initialWords, plagiarismDB.DocumentIdToDBWordsIndexes[kvp.Key]));
             //            initialWords->documentInDBWords
             //PlagiarismInLocalDBFinder.ComposeHtmlText
             //        клик на соурс -> грузим текст из соурса(бд/ урл) -> PlagiarismInLocalDBFinder.ComposeHtmlText(словаСоурса, индексыСловСоурса)->показываем результат как хтмл
-            HashSet<int> docIndexes = Session["Doc"+id] as HashSet<int>;
+            
+            var lol = await WebManager.HtmlToText(@HttpUtility.UrlDecode(id));
+            HashSet<int> docIndexes = Session[@HttpUtility.UrlDecode(id)] as HashSet<int>;
+            TextManager.PrepareText(lol, out string[] urlInitialWords, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out int urlWordCount);
+            ViewBag.Text = TextManager.ComposeHtmlText(urlInitialWords, docIndexes);
+            ViewBag.Message = "AntiP Main page.";
+
+            return View();
+        }
+        public ActionResult SourceDB(int id)
+        {
+
+            //            plagiarismDB.DocumentIdToDBDocumentHtml.Add(kvp.Key, ComposeHtmlText(initialWords, plagiarismDB.DocumentIdToDBWordsIndexes[kvp.Key]));
+            //            initialWords->documentInDBWords
+            //PlagiarismInLocalDBFinder.ComposeHtmlText
+            //        клик на соурс -> грузим текст из соурса(бд/ урл) -> PlagiarismInLocalDBFinder.ComposeHtmlText(словаСоурса, индексыСловСоурса)->показываем результат как хтмл
+
+            HashSet<int> docIndexes = Session["Doc" + id] as HashSet<int>;
 
 
             ViewBag.Text = TextManager.ComposeHtmlText(TextManager.WordsFromText(SQLLoader.GetDoc(id)).ToArray(), docIndexes);
@@ -89,6 +106,10 @@ namespace AntiPWeb.Controllers
                 foreach (KeyValuePair<int, HashSet<int>> lists in plagiarismInLocalDBResult.PlagiarismDB.DocumentIdToDBWordsIndexes)
                 {
                     Session["Doc" + lists.Key] = lists.Value;
+                }
+                foreach (KeyValuePair<string, HashSet<int>> lists in plagiarismInWebResult.PlagiarismWeb.UrlToWebPageWordsIndexes)
+                {
+                    Session[lists.Key] = lists.Value;
                 }
                 return View("Main", plagiarism);
             }

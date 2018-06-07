@@ -9,6 +9,8 @@ namespace AntiPWeb
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            routes.MapRoute(name: "Name", url: "{controller}/{action}/{*url}");
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
