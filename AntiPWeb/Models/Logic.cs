@@ -6,38 +6,38 @@ namespace AntiPShared
     public class Logic
     {
         //Создает словарь слова - позиции для одного дока
-        public static Dictionary<string, List<int>> Indexing(string[] words)
+        public static Dictionary<string, List<int>> Indexing(int[] initialDocIndexes, string[] simplifiedWords)
         {
             var wordToPositions = new Dictionary<string, List<int>>();
 
-            for (int position = 0; position < words.Length; position++)
+            for (int i = 0; i < simplifiedWords.Length; i++)
             {
-                if (wordToPositions.TryGetValue(words[position], out List<int> positions))
+                if (wordToPositions.TryGetValue(simplifiedWords[i], out List<int> positions))
                 {
-                    positions.Add(position);
+                    positions.Add(initialDocIndexes[i]);
                 }
                 else
                 {
-                    wordToPositions.Add(words[position], new List<int> { position });
+                    wordToPositions.Add(simplifiedWords[i], new List<int> { initialDocIndexes[i] });
                 }
             }
 
             return wordToPositions;
         }
 
-        public static Dictionary<string, string> IndexingForDB(string[] words)
+        public static Dictionary<string, string> IndexingForDB(int[] initialDocIndexes, string[] simplifiedWords)
         {
             var wordToPositions = new Dictionary<string, string>();
 
-            for (int position = 0; position < words.Length; position++)
+            for (int i = 0; i < simplifiedWords.Length; i++)
             {
-                if (wordToPositions.ContainsKey(words[position]))
+                if (wordToPositions.ContainsKey(simplifiedWords[i]))
                 {
-                    wordToPositions[words[position]] += $",{position}";
+                    wordToPositions[simplifiedWords[i]] += $",{initialDocIndexes[i]}";
                 }
                 else
                 {
-                    wordToPositions.Add(words[position], position.ToString());
+                    wordToPositions.Add(simplifiedWords[i], initialDocIndexes[i].ToString());
                 }
             }
 

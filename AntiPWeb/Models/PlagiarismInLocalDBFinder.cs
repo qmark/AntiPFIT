@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,17 +8,26 @@ namespace AntiPShared
 {
     public class PlagiarismInLocalDBFinder
     {
-        public static async Task<PlagiarismInLocalDBResult> Find(string[] initialWords, int[] initialDocIndexes, string[] simplifiedWords)
+        public static async Task<PlagiarismInLocalDBResult> FindAsync(string[] initialWords, Dictionary<int, string> initialDocIndexToSimplifiedWord, int[] initialDocIndexes, string[] simplifiedWords)
         {
             var plagiarismDB = new PlagiarismDB();
             double vodnost = 0;
 
-            for (int i = 0; i < initialDocIndexes.Length - Shingle.Lenght; i++)
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
             {
                 if (TextManager.StopWords.Contains(simplifiedWords[i]))
                     vodnost++;
 
-                var documentIdToDBDocWordsPositionsForShingle = SQLLoader.GetDocuments(Shingle.ListFromWords(simplifiedWords, i));
+                List<string> wordsList = new List<string>();
+                for (int j = 0; j < Shingle.Lenght; j++)
+                {
+                    wordsList.Add(initialDocIndexToSimplifiedWord[initialDocIndexes[i + j]]);
+                }
+
+                var documentIdToDBDocWordsPositionsForShingle = SQLLoader.GetDocuments(wordsList);
+                if (documentIdToDBDocWordsPositionsForShingle.Count == 0) continue;
 
                 var initialDocIndexesForShingle = new List<int>();
                 for (int j = 0; j < Shingle.Lenght; j++)
@@ -35,8 +45,8 @@ namespace AntiPShared
                     }
                     else
                     {
-                        plagiarismDB.DocumentIdToDBWordsIndexes.Add(kvp.Key, kvp.Value);
-                        plagiarismDB.DocumentIdToInitialWordsIndexes.Add(kvp.Key, plagiarismDBForShingle.DocumentIdToInitialWordsIndexes[kvp.Key]);
+                        plagiarismDB.DocumentIdToDBWordsIndexes.Add(kvp.Key, new HashSet<int>(kvp.Value));
+                        plagiarismDB.DocumentIdToInitialWordsIndexes.Add(kvp.Key, new HashSet<int>(plagiarismDBForShingle.DocumentIdToInitialWordsIndexes[kvp.Key]));
                     }
                 }
                 foreach (var kvp in plagiarismDBForShingle.InitialWordIndexToDocumentIds)
@@ -47,10 +57,12 @@ namespace AntiPShared
                     }
                     else
                     {
-                        plagiarismDB.InitialWordIndexToDocumentIds.Add(kvp.Key, kvp.Value);
+                        plagiarismDB.InitialWordIndexToDocumentIds.Add(kvp.Key, new HashSet<int>(kvp.Value));
                     }
                 }
             }
+            stopwatch.Stop();
+            Debug.WriteLine("DB PLAG TIME " + stopwatch.ElapsedMilliseconds);
 
             foreach (var kvp in plagiarismDB.DocumentIdToInitialWordsIndexes)
             {

@@ -69,7 +69,6 @@ namespace AntiPShared
         {
             List<List<int>> result = new List<List<int>>();
 
-            bool allFound = true;
             for (int i = 0; i < input.Count; i++)
             {
                 if (indexedText.TryGetValue(input[i], out List<int> wordIndexes))
@@ -78,11 +77,11 @@ namespace AntiPShared
                 }
                 else
                 {
-                    allFound = false;
+                    return new List<List<int>>();
                 }
             }
 
-            return allFound ? result : new List<List<int>>();
+            return result;
         }
 
     }

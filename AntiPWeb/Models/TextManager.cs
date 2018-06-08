@@ -1292,10 +1292,10 @@ namespace AntiPShared
             //return new string(text.Replace('-', ' ').Where(c => !char.IsPunctuation(c)).ToArray()).ToLower().Replace("\r\n", " ");
         }
 
-        public static void PrepareText(string initialText, out string[] initialWords, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount)
+        public static void PrepareText(string initialText, out string[] initialWords, out Dictionary<int, string> initialDocIndexToSimplifiedWord, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount)
         {
             initialWords = WordsFromText(initialText).ToArray();
-            var initialDocIndexToSimplifiedWord = new Dictionary<int, string>();
+            initialDocIndexToSimplifiedWord = new Dictionary<int, string>();
             for (int initialDocIndex = 0; initialDocIndex < initialWords.Length; initialDocIndex++)
             {
                 var currentInitialWord = initialWords[initialDocIndex];

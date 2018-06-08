@@ -32,7 +32,7 @@ namespace FilesIndexer
         private static Dictionary<int, List<List<int>>> GetDocuments(List<String> input)
         {
             Dictionary<int, List<List<int>>> result = new Dictionary<int, List<List<int>>>();
-           
+
             SqlDbConnection SQL = new SqlDbConnection();
             SQL.Procedurename = "readFromTbl";
             SQL.AddParameter("command", "getDocuments");
@@ -44,7 +44,7 @@ namespace FilesIndexer
             SQL.ExecuteObject();
             for (int j = 0; j < SQL.ResultRowAmount; j++)
             {
-                
+
                 List<List<int>> PositionsLists = new List<List<int>>();
                 PositionsLists.Add(ParsePositions(SQL.GetFieldByName(j, "FirstList")));
                 PositionsLists.Add(ParsePositions(SQL.GetFieldByName(j, "SecondList")));
@@ -54,12 +54,12 @@ namespace FilesIndexer
                 result.Add(Convert.ToInt32(SQL.GetFieldByName(j, "DocumentId")), PositionsLists);
             }
             return result;
-            
+
         }
-       
-        
+
+
         private static void AddWords(Dictionary<String, String> words, String docName)
-        {        
+        {
             SqlDbConnection SQL = new SqlDbConnection();
             var dt = ConvertToDataTable(words, docName);
             SQL.Procedurename = "readFromTbl";
@@ -76,7 +76,7 @@ namespace FilesIndexer
             SQL.AddParameter("command", "addDoc");
             SQL.AddParameter("name", name);
             SQL.AddParameter("text", text);
-            SQL.ExecuteObject();           
+            SQL.ExecuteObject();
         }
 
         private static DataTable ConvertToDataTable(Dictionary<string, string> dict, String docName)
@@ -107,17 +107,24 @@ namespace FilesIndexer
 
         static void Main(string[] args)
         {
-            string nameFile = "Пар 3-01 Інтеграл Ньютона-Лейбніца";
-            string test = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + nameFile + ".doc");
-            AddDocument(nameFile, test);
-            test = TextManager.SimplifyText(test).Replace("\r\n", " ");
-            AddWords(Logic.IndexingForDB(TextManager.WordsFromText(test).ToArray()), nameFile);
+            //string nameFile = "Пар 3-01 Інтеграл Ньютона-Лейбніца";
+            //string test = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + nameFile + ".doc");
+            //AddDocument(nameFile, test);
+            //test = TextManager.SimplifyText(test).Replace("\r\n", " ");
+            //AddWords(Logic.IndexingForDB(TextManager.WordsFromText(test).ToArray()), nameFile);
 
 
 
+            string fileName = "Пар 3-01 Інтеграл Ньютона-Лейбніца";
+            string initialText = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + fileName + ".doc");
+
+            AddDocument(fileName, initialText);
+
+            TextManager.PrepareText(initialText, out string[] initialWords, out Dictionary<int, string> initialDocIndexToSimplifiedWord, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount);
+            AddWords(Logic.IndexingForDB(initialDocIndexes, simplifiedWords), fileName);
 
 
-            
+
 
 
 

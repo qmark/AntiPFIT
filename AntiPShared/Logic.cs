@@ -5,67 +5,67 @@ namespace AntiPShared
 {
     public class Logic
     {
-
         //Создает словарь слова - позиции для одного дока
-        public static Dictionary<string, List<int>> Indexing(string[] words)
+        public static Dictionary<string, List<int>> Indexing(int[] initialDocIndexes, string[] simplifiedWords)
         {
             var wordToPositions = new Dictionary<string, List<int>>();
 
-            for (int position = 0; position < words.Length; position++)
+            for (int i = 0; i < simplifiedWords.Length; i++)
             {
-                if (wordToPositions.TryGetValue(words[position], out List<int> positions))
+                if (wordToPositions.TryGetValue(simplifiedWords[i], out List<int> positions))
                 {
-                    positions.Add(position);
+                    positions.Add(initialDocIndexes[i]);
                 }
                 else
                 {
-                    wordToPositions.Add(words[position], new List<int> { position });
+                    wordToPositions.Add(simplifiedWords[i], new List<int> { initialDocIndexes[i] });
                 }
             }
 
             return wordToPositions;
         }
 
-        public static Dictionary<string, string> IndexingForDB(string[] words)
+        public static Dictionary<string, string> IndexingForDB(int[] initialDocIndexes, string[] simplifiedWords)
         {
             var wordToPositions = new Dictionary<string, string>();
 
-            for (int position = 0; position < words.Length; position++)
+            for (int i = 0; i < simplifiedWords.Length; i++)
             {
-                if (wordToPositions.ContainsKey(words[position]))
+                if (wordToPositions.ContainsKey(simplifiedWords[i]))
                 {
-                    wordToPositions[words[position]] += $",{position}";
+                    wordToPositions[simplifiedWords[i]] += $",{initialDocIndexes[i]}";
                 }
                 else
                 {
-                    wordToPositions.Add(words[position], position.ToString());
+                    wordToPositions.Add(simplifiedWords[i], initialDocIndexes[i].ToString());
                 }
             }
 
             return wordToPositions;
         }
 
-        public static List<CheckResult> GetCheckResults(List<string> orderedUrls, int urlCountCap, Dictionary<string, List<string>> urlToCommonTextParts, double originalTextCharactersCount)
+        public static Dictionary<string, WebCheckResult> GetUrlToWebCheckResults(List<string> orderedUrls, int urlCountCap, Dictionary<string, List<string>> urlToCommonTextParts, double originalTextCharactersCount)
         {
-            List<CheckResult> results = new List<CheckResult>();
+            Dictionary<string, WebCheckResult> urlToWebCheckResults = new Dictionary<string, WebCheckResult>();
+
             for (int i = 0; i < urlCountCap; i++)
             {
-                CheckResult result = new CheckResult();
-                result.Url = orderedUrls[i];
-
-                result.CommonTextParts = urlToCommonTextParts[orderedUrls[i]];
+                WebCheckResult result = new WebCheckResult
+                {
+                    CommonTextParts = urlToCommonTextParts[orderedUrls[i]]
+                };
 
                 string commonText = string.Empty;
                 foreach (var commonTextPart in result.CommonTextParts)
                 {
                     commonText += commonTextPart;
                 }
-
                 result.CharactersPercentage = commonText.RemoveWhiteSpaces().Length / originalTextCharactersCount;
 
-                results.Add(result);
+                urlToWebCheckResults.Add(orderedUrls[i], result);
             }
-            return results;
+
+            return urlToWebCheckResults;
         }
 
         //список шинглов
@@ -93,56 +93,5 @@ namespace AntiPShared
             }
             return shingleTexts;
         }
-
-        public static Dictionary<int, List<(int, int)>> FindPlagiarism(Dictionary<int, List<List<int>>> documentIdsToWordPositions, int firstWordInitialDocIndex)
-        {
-            const int MagicDistanceBetweenIndexes = 3;
-
-            // documentID to words' indexes
-            var plagiarism = new Dictionary<int, List<(int, int)>>();
-
-            foreach (var kvp in documentIdsToWordPositions)
-            {
-                for (int firstWordPosition = 0; firstWordPosition < kvp.Value[0].Count; firstWordPosition++)
-                {
-                    var wordsPositons = new List<(int DBDocIndex, int initialDocIndex)>
-                    {
-                        (kvp.Value[0][firstWordPosition], firstWordInitialDocIndex)
-                    };
-
-                    bool hasEverything = true;
-                    //                                   kvp.Value.Count == Shingle.Lenght
-                    for (int i = 1; hasEverything && i < kvp.Value.Count; i++)
-                    {
-                        int wordIndexOnDistance = kvp.Value[i].Find(item => Math.Abs(item - wordsPositons[i - 1].DBDocIndex) < MagicDistanceBetweenIndexes);
-
-                        if (wordIndexOnDistance != 0)
-                        {
-                            wordsPositons.Add((wordIndexOnDistance, firstWordInitialDocIndex + i));
-                        }
-                        else
-                        {
-                            hasEverything = false;
-                            break;
-                        }
-                    }
-
-                    if (hasEverything)
-                    {
-                        if (plagiarism.TryGetValue(kvp.Key, out List<(int, int)> plagiarizedPositions))
-                        {
-                            plagiarizedPositions.AddRange(wordsPositons);
-                        }
-                        else
-                        {
-                            plagiarism.Add(kvp.Key, wordsPositons);
-                        }
-                    }
-                }
-            }
-
-            return plagiarism;
-        }
-
     }
 }
