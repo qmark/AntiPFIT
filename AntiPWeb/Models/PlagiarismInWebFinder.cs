@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,102 +9,98 @@ namespace AntiPShared
 {
     public class PlagiarismInWebFinder
     {
-        public static async Task<PlagiarismInWebResult> FindAsync(string serverMapPath, string[] initialWords, Dictionary<int, string> initialDocIndexToSimplifiedWord, int[] initialDocIndexes, string[] simplifiedWords, int wordCount)
+        public static async Task<Plagiarism<string>> FindAsync(string serverMapPath, string[] initialWords, Dictionary<int, string> initialDocIndexToSimplifiedWord, int[] initialDocIndexes, string[] simplifiedWords, int wordCount)
         {
-            //return new PlagiarismInWebResult { PlagiarismWeb = new PlagiarismWeb() };
+            //return new Plagiarism<string>();
 
-            var plagiarismWeb = new PlagiarismWeb();
+            var plagiarismWeb = new Plagiarism<string>();
 
             Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
-            //Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexes = GetUrlToInitialDocWordsIndexesFromGoogleAPIParallel(initialDocIndexes, simplifiedWords);
+            //Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexesSet = GetUrlToInitialDocWordsIndexesFromGoogleAPIParallel(initialDocIndexes, simplifiedWords);
             //stopwatch.Stop();
             //Debug.WriteLine("GSEARCH TIME " + stopwatch.ElapsedMilliseconds);
 
             var fileName = "serializedGS.txt";
             var path = Path.Combine(serverMapPath, fileName);
-            //var serializedGS = JsonConvert.SerializeObject(urlToInitialDocWordsIndexes);
+            //var serializedGS = JsonConvert.SerializeObject(urlToInitialDocWordsIndexesSet);
             //File.WriteAllText(path, serializedGS);
 
-            var urlToInitialDocWordsIndexes = JsonConvert.DeserializeObject<Dictionary<string, SortedSet<int>>>(File.ReadAllText(path));
+            var urlToInitialDocWordsIndexesSet = JsonConvert.DeserializeObject<Dictionary<string, SortedSet<int>>>(File.ReadAllText(path));
+            var urlToInitialDocWordsIndexesList = urlToInitialDocWordsIndexesSet.ToDictionary(pair => pair.Key, pair => pair.Value.ToList());
 
-            var orderedUrlToInitialDocWordsIndexes = urlToInitialDocWordsIndexes.OrderByDescending(kvp => kvp.Value.Count).ToDictionary(pair => pair.Key, pair => pair.Value.ToList());
-            var orderedUrls = orderedUrlToInitialDocWordsIndexes.Keys.ToList();
+            var mostPopularUrls = GetMostPopularUrls(urlToInitialDocWordsIndexesSet);
 
-            var urlsCountCap = (int)Math.Ceiling(wordCount * 0.1);
             stopwatch.Restart();
-            var orderedUrlsSimplifiedTexts = await WebManager.TextsAsync(urlsCountCap, orderedUrls);
+            var urlsSimplifiedTexts = await WebManager.TextsAsync(mostPopularUrls);
             stopwatch.Stop();
             Debug.WriteLine("WebManager.TextsAsync TIME " + stopwatch.ElapsedMilliseconds);
 
             stopwatch.Restart();
-            for (int i = 0; i < urlsCountCap; i++)
+            var tasks = new Task<List<Plagiarism<string>>>[mostPopularUrls.Count];
+
+            for (int i = 0; i < mostPopularUrls.Count; i++)
             {
-                TextManager.PrepareText(orderedUrlsSimplifiedTexts[i], out _, out _, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out _);
-                var indexedUrlText = Logic.Indexing(urlInitialDocIndexes, urlSimplifiedWords);
-                var initialDocIndexesFoundOnUrl = orderedUrlToInitialDocWordsIndexes[orderedUrls[i]];
+                int savei = i;
 
-                for (int j = 0; j <= initialDocIndexesFoundOnUrl.Count - Shingle.Lenght; j++)
+                tasks[i] = Task<List<Plagiarism<string>>>.Factory.StartNew(() =>
                 {
-                    List<string> wordsList = new List<string>();
-                    for (int k = 0; k < Shingle.Lenght; k++)
+                    TextManager.PrepareText(urlsSimplifiedTexts[savei], out _, out _, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out _);
+                    var indexedUrlText = Logic.Indexing(urlInitialDocIndexes, urlSimplifiedWords);
+                    var initialDocIndexesFoundOnUrl = urlToInitialDocWordsIndexesList[mostPopularUrls[savei]];
+
+                    var plagiarismWebs = new List<Plagiarism<string>>();
+                    for (int j = 0; j <= initialDocIndexesFoundOnUrl.Count - Shingle.Lenght; j++)
                     {
-                        wordsList.Add(initialDocIndexToSimplifiedWord[initialDocIndexesFoundOnUrl[j + k]]);
+                        List<string> wordsList = new List<string>();
+                        for (int k = 0; k < Shingle.Lenght; k++)
+                        {
+                            wordsList.Add(initialDocIndexToSimplifiedWord[initialDocIndexesFoundOnUrl[j + k]]);
+                        }
+
+                        var urlTextWordsPositionsForShingle = TextComparer.FindWordsInIndexedText(wordsList, indexedUrlText);
+                        if (urlTextWordsPositionsForShingle.Count == 0) continue;
+
+                        var initialDocIndexesForShingle = new List<int>();
+                        for (int k = 0; k < Shingle.Lenght; k++)
+                        {
+                            initialDocIndexesForShingle.Add(initialDocIndexesFoundOnUrl[j + k]);
+                        }
+
+                        var urlToWebPageWordsPositionsForShingle = new Dictionary<string, List<List<int>>>
+                        {
+                            { mostPopularUrls[savei], urlTextWordsPositionsForShingle }
+                        };
+
+                        var plagiarismWebForShingle = Logic.FindPlagiarism(urlToWebPageWordsPositionsForShingle, initialDocIndexesForShingle);
+                        plagiarismWebs.Add(plagiarismWebForShingle);
                     }
 
-                    var urlTextWordsPositionsForShingle = TextComparer.FindWordsInIndexedText(wordsList, indexedUrlText);
-                    if (urlTextWordsPositionsForShingle.Count == 0) continue;
+                    return plagiarismWebs;
+                });
+            }
 
-                    var initialDocIndexesForShingle = new List<int>();
-                    for (int k = 0; k < Shingle.Lenght; k++)
-                    {
-                        initialDocIndexesForShingle.Add(initialDocIndexesFoundOnUrl[j + k]);
-                    }
+            Task.WaitAll(tasks);
 
-                    var urlToWebPageWordsPositionsForShingle = new Dictionary<string, List<List<int>>>
-                    {
-                        { orderedUrls[i], urlTextWordsPositionsForShingle }
-                    };
+            for (int i = 0; i < mostPopularUrls.Count; i++)
+            {
+                var plagiarismWebs = tasks[i].Result;
 
-                    var plagiarismWebForShingle = Logic.FindPlagiarism(urlToWebPageWordsPositionsForShingle, initialDocIndexesForShingle);
-                    foreach (var kvp in plagiarismWebForShingle.UrlToWebPageWordsIndexes)
-                    {
-                        if (plagiarismWeb.UrlToWebPageWordsIndexes.TryGetValue(kvp.Key, out HashSet<int> plagiarizedWebPageWordsIndexes))
-                        {
-                            plagiarizedWebPageWordsIndexes.UnionWith(kvp.Value);
-                            plagiarismWeb.UrlToInitialWordsIndexes[kvp.Key].UnionWith(plagiarismWebForShingle.UrlToInitialWordsIndexes[kvp.Key]);
-                        }
-                        else
-                        {
-                            plagiarismWeb.UrlToWebPageWordsIndexes.Add(kvp.Key, new HashSet<int>(kvp.Value));
-                            plagiarismWeb.UrlToInitialWordsIndexes.Add(kvp.Key, new HashSet<int>(plagiarismWebForShingle.UrlToInitialWordsIndexes[kvp.Key]));
-                        }
-                    }
-                    foreach (var kvp in plagiarismWebForShingle.InitialWordIndexToUrls)
-                    {
-                        if (plagiarismWeb.InitialWordIndexToUrls.TryGetValue(kvp.Key, out HashSet<string> sourceUrls))
-                        {
-                            sourceUrls.UnionWith(kvp.Value);
-                        }
-                        else
-                        {
-                            plagiarismWeb.InitialWordIndexToUrls.Add(kvp.Key, new HashSet<string>(kvp.Value));
-                        }
-                    }
+                for (int j = 0; j < plagiarismWebs.Count; j++)
+                {
+                    var plagiarismWebForShingle = plagiarismWebs[j];
+                    plagiarismWeb.Add(plagiarismWebForShingle);
                 }
             }
             stopwatch.Stop();
             Debug.WriteLine("FIND WEB PLAGIARISM ON TOP URLS TIME " + stopwatch.ElapsedMilliseconds);
 
-            foreach (var kvp in plagiarismWeb.UrlToInitialWordsIndexes)
+            foreach (var kvp in plagiarismWeb.SourceIdToInitialWordsIndexes)
             {
-                plagiarismWeb.UrlToInitialDocumentHtml.Add(kvp.Key, TextManager.ComposeHtmlText(initialWords, kvp.Value));
+                plagiarismWeb.SourceIdToInitialDocumentHtml.Add(kvp.Key, TextManager.ComposeHtmlText(initialWords, kvp.Value));
             }
 
-            return new PlagiarismInWebResult
-            {
-                PlagiarismWeb = plagiarismWeb
-            };
+            return plagiarismWeb;
         }
 
         private static Dictionary<string, SortedSet<int>> GetUrlToInitialDocWordsIndexesFromGoogleAPIParallel(int[] initialDocIndexes, string[] simplifiedWords)
@@ -147,5 +142,32 @@ namespace AntiPShared
 
             return urlToInitialDocWordsIndexes;
         }
+
+        private static List<string> GetMostPopularUrls(Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexes)
+        {
+            Dictionary<int, (string url, int indexesCount)> initialDocWordIndexToMostPopularUrlAndIndexesCount = new Dictionary<int, (string url, int indexesCount)>();
+
+            foreach (var urlAndIndexes in urlToInitialDocWordsIndexes)
+            {
+                foreach (var index in urlAndIndexes.Value)
+                {
+                    if (initialDocWordIndexToMostPopularUrlAndIndexesCount.TryGetValue(index, out (string url, int indexesCount) urlAndIndexesCount))
+                    {
+                        if (urlAndIndexes.Value.Count > urlAndIndexesCount.indexesCount)
+                        {
+                            initialDocWordIndexToMostPopularUrlAndIndexesCount[index] = (urlAndIndexes.Key, urlAndIndexes.Value.Count);
+                        }
+                    }
+                    else
+                    {
+                        initialDocWordIndexToMostPopularUrlAndIndexesCount.Add(index, (urlAndIndexes.Key, urlAndIndexes.Value.Count));
+                    }
+                }
+            }
+
+            const int MagicWordCap = 10;
+            return initialDocWordIndexToMostPopularUrlAndIndexesCount.Values.Where(x => x.indexesCount >= MagicWordCap).Select(x => x.url).Distinct().ToList();
+        }
+
     }
 }

@@ -240,26 +240,19 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\PlagiarismWeb.cs" />
-    <Compile Include="Models\WebCheckResult.cs" />
+    <Compile Include="Models\Plagiarism.cs" />
+    <Compile Include="Models\TextAnalyzer.cs" />
     <Compile Include="Models\GoogleAPIManager.cs" />
     <Compile Include="Models\Logic.cs" />
-    <Compile Include="Models\OCR.cs" />
-    <Compile Include="Models\Plagiarism.cs" />
-    <Compile Include="Models\PlagiarismDB.cs" />
-    <Compile Include="Models\PlagiarismInLocalDBResult.cs" />
+    <Compile Include="Models\PlagiarismResult.cs" />
     <Compile Include="Models\PlagiarismInLocalDBFinder.cs" />
-    <Compile Include="Models\PlagiarismInWebResult.cs" />
     <Compile Include="Models\PlagiarismInWebFinder.cs" />
-    <Compile Include="Models\SharedExtensions.cs" />
     <Compile Include="Models\Shingle.cs" />
     <Compile Include="Models\SqlDbConnection.cs" />
     <Compile Include="Models\SQLLoader.cs" />
-    <Compile Include="Models\StaTaskScheduler.cs" />
     <Compile Include="Models\TextComparer.cs" />
     <Compile Include="Models\TextDocumentManager.cs" />
     <Compile Include="Models\TextManager.cs" />
-    <Compile Include="Models\UnidiffFormater.cs" />
     <Compile Include="Models\WebManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

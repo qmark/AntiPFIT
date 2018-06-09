@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Schedulers;
 
 namespace AntiPShared
 {
@@ -16,17 +15,17 @@ namespace AntiPShared
         #region Urls From Parsing
         public static Dictionary<string, List<int>> UrlsFromParsing(List<Shingle> shingles)
         {
-            var staScheduler = new StaTaskScheduler(numberOfThreads: 1); // МЕДЛЕННО, НО ДОЛЬШЕ БЕЗ КАПЧИ
+            //var staScheduler = new StaTaskScheduler(numberOfThreads: 1); // МЕДЛЕННО, НО ДОЛЬШЕ БЕЗ КАПЧИ
             //var staScheduler = new StaTaskScheduler(numberOfThreads: shingles.Count); // (В Ж)БАН ПРИЛЕТАЕТ СРАЗУ ЖЕ
             var tasks = new Task<(int, List<string>)>[shingles.Count];
             for (int i = 0; i < shingles.Count; i++)
             {
                 int j = i;
                 tasks[j] = Task<(int, List<string>)>.Factory.StartNew(() => FirstWordIndexAndUrls(shingles[j])
-                    , CancellationToken.None
-                    , TaskCreationOptions.None
-                    //, TaskScheduler.FromCurrentSynchronizationContext()
-                    , staScheduler
+                //, CancellationToken.None
+                //, TaskCreationOptions.None
+                ////, TaskScheduler.FromCurrentSynchronizationContext()
+                //, staScheduler
                 );
             }
 
@@ -169,7 +168,7 @@ namespace AntiPShared
             return webPagesTexts;
         }
 
-        public static async Task<string[]> TextsAsync(int urlsCountCap, List<string> urls)
+        public static async Task<string[]> TextsAsync(List<string> urls, int urlsCountCap)
         {
             var tasks = new Task<string>[urlsCountCap];
             for (int i = 0; i < urlsCountCap; i++)
@@ -180,6 +179,24 @@ namespace AntiPShared
             var allResults = await Task.WhenAll(tasks);
 
             var webPagesTexts = new string[urlsCountCap];
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                webPagesTexts[i] = allResults[i];
+            }
+            return webPagesTexts;
+        }
+
+        public static async Task<string[]> TextsAsync(List<string> urls)
+        {
+            var tasks = new Task<string>[urls.Count];
+            for (int i = 0; i < urls.Count; i++)
+            {
+                tasks[i] = HtmlToTextAsync(urls[i]);
+            }
+
+            var allResults = await Task.WhenAll(tasks);
+
+            var webPagesTexts = new string[urls.Count];
             for (int i = 0; i < tasks.Length; i++)
             {
                 webPagesTexts[i] = allResults[i];

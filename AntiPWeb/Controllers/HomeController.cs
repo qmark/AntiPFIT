@@ -87,30 +87,31 @@ namespace AntiPWeb.Controllers
 
                 await Task.WhenAll(plagiarismInWebSearch, plagiarismInLocalDBSearch);
 
-                var plagiarismInWebResult = plagiarismInWebSearch.Result;
-                var plagiarismInLocalDBResult = plagiarismInLocalDBSearch.Result;
+                var plagiarismInWeb = plagiarismInWebSearch.Result;
+                var plagiarismInLocalDB = plagiarismInLocalDBSearch.Result;
 
-                var DBPlagiarizedIndexes = plagiarismInLocalDBResult.PlagiarismDB.InitialWordIndexToDocumentIds.Keys.ToList();
-                DBPlagiarizedIndexes.AddRange(plagiarismInWebResult.PlagiarismWeb.InitialWordIndexToUrls.Keys.ToList());
+                var DBPlagiarizedIndexes = plagiarismInLocalDB.InitialWordIndexToSourceIds.Keys.ToList();
+                DBPlagiarizedIndexes.AddRange(plagiarismInWeb.InitialWordIndexToSourceIds.Keys.ToList());
                 var allPlagiarismHtmlText = TextManager.ComposeHtmlText(initialWords, DBPlagiarizedIndexes);
 
-                Plagiarism plagiarism = new Plagiarism
+                var (vodnost, toshnotnost) = TextAnalyzer.Analyze(simplifiedWords);
+                PlagiarismResult plagiarism = new PlagiarismResult
                 {
                     InitialWords = initialWords,
                     SimplifiedWords = simplifiedWords,
                     WordCount = wordCount,
-                    Vodnost = plagiarismInLocalDBResult.Vodnost,
-                    Toshnotnost = plagiarismInLocalDBResult.Toshnotnost,
-                    PlagiarismWeb = plagiarismInWebResult.PlagiarismWeb,
-                    PlagiarismDB = plagiarismInLocalDBResult.PlagiarismDB,
+                    Vodnost = vodnost,
+                    Toshnotnost = toshnotnost,
+                    PlagiarismWeb = plagiarismInWeb,
+                    PlagiarismDB = plagiarismInLocalDB,
                     AllPlagiarismHtmlText = allPlagiarismHtmlText
                 };
 
-                foreach (KeyValuePair<int, HashSet<int>> lists in plagiarismInLocalDBResult.PlagiarismDB.DocumentIdToDBWordsIndexes)
+                foreach (KeyValuePair<int, HashSet<int>> lists in plagiarismInLocalDB.SourceIdToSourceWordsIndexes)
                 {
                     Session["Doc" + lists.Key] = lists.Value;
                 }
-                foreach (KeyValuePair<string, HashSet<int>> lists in plagiarismInWebResult.PlagiarismWeb.UrlToWebPageWordsIndexes)
+                foreach (KeyValuePair<string, HashSet<int>> lists in plagiarismInWeb.SourceIdToSourceWordsIndexes)
                 {
                     Session[lists.Key] = lists.Value;
                 }

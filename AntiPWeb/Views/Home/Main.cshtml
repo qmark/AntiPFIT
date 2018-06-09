@@ -5,7 +5,7 @@
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
 @using AntiPShared
-@model AntiPShared.Plagiarism
+@model AntiPShared.PlagiarismResult
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 <p>Use this area to provide additional information.</p>
 
@@ -62,10 +62,10 @@
                 {
                     <ul>
 
-                        @foreach (var x in @Model.PlagiarismDB.DocumentIdToDBWordsIndexes.Keys)
+                        @foreach (var x in @Model.PlagiarismDB.SourceIdToSourceWordsIndexes.Keys)
                         {
                             <li class="option">
-                                <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
+                                <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
                                 <span class="reslink" onclick="dbHighlight(@x)"> @x </span>
                                 @*<button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>*@
                                 <a href="@Url.Action("SourceDB", "Home", new { id = x })" target="_blank">View Link</a>
@@ -80,10 +80,10 @@
 
                     <ul>
 
-                        @foreach (var x in @Model.PlagiarismWeb.UrlToWebPageWordsIndexes.Keys)
+                        @foreach (var x in @Model.PlagiarismWeb.SourceIdToSourceWordsIndexes.Keys)
                         {
                             <li class="option">
-                                <span class="percent" onclick="webHighlight('@x')"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.UrlToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol %</span>
+                                <span class="percent" onclick="webHighlight('@x')"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol %</span>
                                 <span class="reslink" onclick="webHighlight('@x')"> @x</span>
                                 @*<button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>*@
                                 <a href="@Url.Action("SourceUrl", "Home", new { id = @HttpUtility.UrlEncode(x) })" target="_blank">View Link</a>
@@ -166,7 +166,7 @@
                 }
            }
 
-                var data = @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismDB.DocumentIdToInitialDocumentHtml));
+                var data = @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismDB.SourceIdToInitialDocumentHtml));
                 if (data != null)
                 {
                     var innerHtml = data[id];
@@ -185,7 +185,7 @@
                 } 
            }
 
-                var data = @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismWeb.UrlToInitialDocumentHtml));
+                var data = @Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismWeb.SourceIdToInitialDocumentHtml));
                 if (data != null)
                 {
                     var innerHtml = data[id];
