@@ -30,18 +30,19 @@ namespace AntiPShared
             var urlToCommonTextParts = TextComparer.CommonTextParts(orderedUrls, orderedUrlToWordsIndexes, words, webPagesSimplifiedTexts);
 
             double originalTextCharactersCount = simplifiedText.RemoveWhiteSpaces().Length;
-            var webResults = Logic.GetCheckResults(orderedUrls, urlsCountCap, urlToCommonTextParts, originalTextCharactersCount);
+            //var webResults = Logic.GetCheckResults(orderedUrls, urlsCountCap, urlToCommonTextParts, originalTextCharactersCount);
 
-            var orderedWebResults = webResults.OrderByDescending(res => res.CharactersPercentage).ToList();
+            //var orderedWebResults = webResults.OrderByDescending(res => res.CharactersPercentage).ToList();
 
-            return new PlagiarismInWeb
-            {
-                Words = words,
-                WordCount = wordCount,
-                OrderedUrlToWordsIndexes = orderedUrlToWordsIndexes,
-                OrderedUrls = orderedUrls,
-                OrderedWebResults = orderedWebResults
-            };
+            //return new PlagiarismInWeb
+            //{
+            //    Words = words,
+            //    WordCount = wordCount,
+            //    OrderedUrlToWordsIndexes = orderedUrlToWordsIndexes,
+            //    OrderedUrls = orderedUrls,
+            //    OrderedWebResults = orderedWebResults
+            //};
+            return null;
         }
     }
 }

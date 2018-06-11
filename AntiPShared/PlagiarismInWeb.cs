@@ -8,6 +8,6 @@ namespace AntiPShared
         public int WordCount { get; set; }
         public Dictionary<string, List<int>> OrderedUrlToWordsIndexes { get; set; }
         public List<string> OrderedUrls { get; set; }
-        public List<CheckResult> OrderedWebResults { get; set; }
+      
     }
 }

@@ -22,18 +22,18 @@ namespace AntiPShared
 
                 var documentIdToWordsPositions = SQLLoader.GetDocuments(Shingle.ListFromWords(words, i));
 
-                var plagiarismForShingle = Logic.FindPlagiarism(documentIdToWordsPositions, i);
-                foreach (var kvp in plagiarismForShingle)
-                {
-                    if (plagiarismResult.TryGetValue(kvp.Key, out HashSet<(int DBDocIndex, int initialDocIndex)> plagiarizedPositions))
-                    {
-                        plagiarizedPositions.UnionWith(kvp.Value);
-                    }
-                    else
-                    {
-                        plagiarismResult.Add(kvp.Key, new HashSet<(int, int)>(kvp.Value));
-                    }
-                }
+                //var plagiarismForShingle = Logic.FindPlagiarism(documentIdToWordsPositions, i);
+                //foreach (var kvp in plagiarismForShingle)
+                //{
+                //    if (plagiarismResult.TryGetValue(kvp.Key, out HashSet<(int DBDocIndex, int initialDocIndex)> plagiarizedPositions))
+                //    {
+                //        plagiarizedPositions.UnionWith(kvp.Value);
+                //    }
+                //    else
+                //    {
+                //        plagiarismResult.Add(kvp.Key, new HashSet<(int, int)>(kvp.Value));
+                //    }
+                //}
 
                 Console.WriteLine(i);
             }
