@@ -73,7 +73,8 @@ namespace AntiPWeb.Controllers
         [HttpPost]
         public async Task<ActionResult> Main(HttpPostedFileBase file)
         {
-            if (file.ContentLength > 0)
+
+            if (file?.ContentLength > 0)
             {
                 var fileName = Path.GetFileName(file.FileName);
                 var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);

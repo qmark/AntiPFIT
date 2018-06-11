@@ -45,7 +45,7 @@ textarea {
 }
 
     .slidemenu label {
-        width: 33%;
+        width: 50%;
         text-align: center;
         display: block;
         float: left;
@@ -87,7 +87,7 @@ textarea {
 }
 
     .slider .bar {
-        width: 33%;
+        width: 50%;
         height: 5px;
         background: #333;
         border-radius: 5px;
@@ -113,17 +113,12 @@ textarea {
 }
 
 .slidemenu #slide-item-2:checked ~ .slider .bar {
-    margin-left: 33%;
+    margin-left: 50%;
 }
 
-.slidemenu #slide-item-3:checked ~ .slider .bar {
-    margin-left: 66%;
-}
 
-.bars {
-   
- 
-}
+
+
 .leftbar {
     min-height:200px;
     background-color: white;
@@ -526,3 +521,4 @@ div {
 .button:after, .button:before {
     content: "";
 }*/
+
