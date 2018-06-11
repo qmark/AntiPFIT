@@ -8,6 +8,7 @@ namespace AntiPShared
     {
         public static async Task<Plagiarism<int>> FindAsync(string[] initialWords, Dictionary<int, string> initialDocIndexToSimplifiedWord, int[] initialDocIndexes, string[] simplifiedWords)
         {
+            string debugStr = "";
             var plagiarismDB = new Plagiarism<int>();
 
             Stopwatch stopwatch = new Stopwatch();
@@ -48,13 +49,13 @@ namespace AntiPShared
                 plagiarismDB.Add(plagiarismDBForShingle);
             }
             stopwatch.Stop();
-            Debug.WriteLine("DB PLAG TIME " + stopwatch.ElapsedMilliseconds);
+            debugStr += "DB PLAG TIME " + stopwatch.ElapsedMilliseconds +" ";
 
             foreach (var kvp in plagiarismDB.SourceIdToInitialWordsIndexes)
             {
                 plagiarismDB.SourceIdToInitialDocumentHtml.Add(kvp.Key, TextManager.ComposeHtmlText(initialWords, kvp.Value));
             }
-
+            plagiarismDB.DebugLogs = debugStr;
             return plagiarismDB;
         }
     }

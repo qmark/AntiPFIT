@@ -105,9 +105,10 @@ namespace AntiPWeb.Controllers
                     Toshnotnost = toshnotnost,
                     PlagiarismWeb = plagiarismInWeb,
                     PlagiarismDB = plagiarismInLocalDB,
-                    AllPlagiarismHtmlText = allPlagiarismHtmlText
+                    AllPlagiarismHtmlText = allPlagiarismHtmlText,
+                    DebugLogs = plagiarismInWeb.DebugLogs + plagiarismInLocalDB.DebugLogs
                 };
-
+                ViewBag.DebugLogs = plagiarism.DebugLogs;
                 foreach (KeyValuePair<int, HashSet<int>> lists in plagiarismInLocalDB.SourceIdToSourceWordsIndexes)
                 {
                     Session["Doc" + lists.Key] = lists.Value;

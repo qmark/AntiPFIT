@@ -2,6 +2,7 @@
 {
     public class PlagiarismResult
     {
+        public string DebugLogs { get; set; }
         public string[] InitialWords { get; set; }
         public string[] SimplifiedWords { get; set; }
         public int WordCount { get; set; }

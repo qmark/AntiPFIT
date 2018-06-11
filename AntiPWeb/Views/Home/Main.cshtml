@@ -8,25 +8,25 @@
 @model AntiPShared.PlagiarismResult
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
-
+<script>console.log("@ViewBag.DebugLogs")</script>
 
 
 
 @*<form action="" method="post" enctype="multipart/form-data">
 
-    <label for="file">Filename:</label>
-    <input type="file" name="file" id="file" />
+        <label for="file">Filename:</label>
+        <input type="file" name="file" id="file" />
 
-    <input type="submit" />
-</form>*@
+        <input type="submit" />
+    </form>*@
 
 
-<form action=""  class="forma" method="post" enctype="multipart/form-data">
+<form action="" class="forma" method="post" enctype="multipart/form-data">
 
-    <input type="file" name="file" id="file" class="inputfile inputfile-1"/>
-    <label for="file"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" /></svg> <span>Choose a file&hellip;</span></label>
+    <input type="file" name="file" id="file" class="inputfile inputfile-1" />
+    <label for="file"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" /></svg> <span>Вибрати файл</span></label>
 
-    <input type="submit" class="form-submit-button" />
+    <input type="submit" class="form-submit-button" value="Перевірити" />
 </form>
 
 
@@ -48,6 +48,15 @@
             </p>
         </div>
         <div class=" col-sm-4">
+            @if (Model != null)
+            {
+                <div class="leftbar-stats">
+                    <p>Водянистість тексту: @Math.Round(Model.Vodnost * 100, 2)%</p>
+                    <p>Тошнотність тексту: @Math.Round(Model.Toshnotnost * 100, 2)%</p>
+
+                </div>
+            }
+            @*<p>Загальний плагіат:@{var allTextPrc = Math.Round(Convert.ToDouble(Model.) / Convert.ToDouble(@Model.WordCount) * 100, 2);} @allTextPrc %</p>*@
             <nav class="leftbar slidemenu">
 
                 <!-- Item 1 -->
@@ -66,49 +75,49 @@
                 </div>
                 @if (Model != null)
                 {
-                <hr />
-                <div id="option-db">
-                    @foreach (var x in @Model.PlagiarismDB.SourceIdToSourceWordsIndexes.Keys)
-                    {
+                    <hr />
+                    <div id="option-db">
+                        @foreach (var x in @Model.PlagiarismDB.SourceIdToSourceWordsIndexes.Keys)
+                        {
 
-                    <div class="btn-group btn-group-justified db-search" role="group" aria-label="...">
-                        <div class="percent btn-group" role="group">
-                            <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@{var lol = Math.Round(Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100, 2);} @lol %</button>
-                        </div>
-                        <div class="link-area btn-group" role="group">
-                            <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@x</button>
-                        </div>
-                        <div class="view btn-group" role="group">
-                            <button type="button" class="btn btn-default" onclick="openInNewWd('@Url.Action(" SourceDB", "Home" , new { id=x })')">Перегляд</button>
-                        </div>
+                            <div class="btn-group btn-group-justified db-search" role="group" aria-label="...">
+                                <div class="percent btn-group" role="group">
+                                    <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@{var lol = Math.Round(Convert.ToDouble(Model.PlagiarismDB.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100, 2);} @lol %</button>
+                                </div>
+                                <div class="link-area btn-group" role="group">
+                                    <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@x</button>
+                                </div>
+                                <div class="view btn-group" role="group">
+                                    <button type="button" class="btn btn-default" onclick="openInNewWd('@Url.Action("SourceDB", "Home" , new { id=x })')">Перегляд</button>
+                                </div>
+                            </div>
+
+                            @*<li>
+                                      <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
+                                    <span class="reslink" onclick="dbHighlight(@x)"> @x </span>
+                                    @*<button class="view-link" onclick="location.href='@Url.Action(" Source", "Home" , new {id=@x})'">View Link</button>
+                                    <a href="@Url.Action(" SourceDB", "Home" , new { id=x })" target="_blank">View Link</a>
+
+                                </li>*@
+
+
+                        }
                     </div>
 
-                    @*<li>
-                          <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
-                        <span class="reslink" onclick="dbHighlight(@x)"> @x </span>
-                        @*<button class="view-link" onclick="location.href='@Url.Action(" Source", "Home" , new {id=@x})'">View Link</button>
-                        <a href="@Url.Action(" SourceDB", "Home" , new { id=x })" target="_blank">View Link</a>
-
-                    </li>*@
-
-
-                    }
-                </div>
 
 
 
 
+                    <div id="option-url">
 
-                <div id="option-url">
-
-                    @foreach (var x in @Model.PlagiarismWeb.SourceIdToSourceWordsIndexes.Keys)
-                    {
+                        @foreach (var x in @Model.PlagiarismWeb.SourceIdToSourceWordsIndexes.Keys)
+                        {
 
 
 
                             <div class="btn-group btn-group-justified web-search" role="group" aria-label="...">
                                 <div class="percent btn-group" role="group">
-                                    <button type="button" class="btn btn-default" onclick="webHighlight('@x')">@{var lol = Math.Round(Convert.ToDouble(Model.PlagiarismWeb.UrlToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100, 2);} @lol %</button>
+                                    <button type="button" class="btn btn-default" onclick="webHighlight('@x')">@{var lol = Math.Round(Convert.ToDouble(Model.PlagiarismWeb.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100, 2);} @lol %</button>
                                 </div>
                                 <div class="link-area btn-group" role="group">
                                     <button type="button" class="btn btn-default" onclick="webHighlight('@x')">@x</button>
@@ -120,18 +129,18 @@
 
 
                             @*<li class="option-url" style="position:absolute">
-                                  <span class="percent" onclick="webHighlight('@x')"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol %</span>
-                                    <span class="reslink" onclick="webHighlight('@x')"> </span>
-                                //    <button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>
-                                    <a href="@Url.Action("SourceUrl", "Home", new { id = @HttpUtility.UrlEncode(x) })" target="_blank">View Link</a>
+                                              <span class="percent" onclick="webHighlight('@x')"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol %</span>
+                                                <span class="reslink" onclick="webHighlight('@x')"> </span>
+                                            //    <button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>
+                                                <a href="@Url.Action("SourceUrl", "Home", new { id = @HttpUtility.UrlEncode(x) })" target="_blank">View Link</a>
 
-                    </li>*@
+                                </li>*@
 
-                    }
-                </div>
+                        }
+                    </div>
 
                     @*</ul>*@
-                                        }
+                }
 
 
 
@@ -212,7 +221,6 @@
         background-color: #4CAF50;
         border: none;
         color: white;
-        
         text-decoration: none;
         margin: 4px 2px;
         cursor: pointer;
@@ -230,9 +238,10 @@
 
     .forma {
         margin-bottom: 10px;
-        padding:3px;
+        padding: 3px;
         margin-top: 10px;
     }
+
     .percent {
         width: 19% !important;
     }
@@ -254,6 +263,7 @@
         color: #f1e5e6;
         background-color: #d3394c;
     }
+
     .inputfile {
         width: 0.1px;
         height: 0.1px;
@@ -262,6 +272,7 @@
         position: absolute;
         z-index: -1;
     }
+
         .inputfile + label {
             max-width: 80%;
             font-size: 1.25rem;
@@ -270,9 +281,9 @@
             white-space: nowrap;
             cursor: pointer;
             display: inline-block;
-            
             padding: 0.625rem 1.25rem;
         }
+
             .inputfile + label svg {
                 width: 1em;
                 height: 1em;
@@ -281,25 +292,28 @@
                 margin-top: -0.25em;
                 margin-right: 0.25em;
             }
+
             .inputfile + label * {
                 pointer-events: none;
             }
+
     svg:not(:root) {
         overflow: hidden;
     }
-            .inputfile:focus + label,
-            .inputfile + label:hover {
-                background-color: red;
-            }
 
-        .inputfile:focus + label {
-            outline: 1px dotted #000;
-            outline: -webkit-focus-ring-color auto 5px;
-        }
+    .inputfile:focus + label,
+    .inputfile + label:hover {
+        background-color: red;
+    }
 
-        .inputfile + label * {
-            pointer-events: none;
-        }
+    .inputfile:focus + label {
+        outline: 1px dotted #000;
+        outline: -webkit-focus-ring-color auto 5px;
+    }
+
+    .inputfile + label * {
+        pointer-events: none;
+    }
 </style>
 
 
@@ -357,9 +371,9 @@
     function dbHighlight(id) {
         @{
             IHtmlString htmlStr;
-            try { htmlStr = Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismDB.DocumentIdToInitialDocumentHtml)); }
+            try { htmlStr = Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismDB.SourceIdToInitialDocumentHtml)); }
             catch { htmlStr = null; }; }
-      
+
 
         try {
             var data =  @htmlStr;
@@ -385,9 +399,9 @@
      function webHighlight(id) {
 
 
-         @{  
-                 try { htmlStr = Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismWeb.UrlToInitialDocumentHtml)); }
-                 catch { htmlStr = null; } 
+         @{
+                 try { htmlStr = Html.Raw(@Newtonsoft.Json.JsonConvert.SerializeObject(Model.PlagiarismWeb.SourceIdToInitialDocumentHtml)); }
+                 catch { htmlStr = null; }
 
              }
 
@@ -397,7 +411,7 @@
                  if (data != null)
                  {
                      var innerHtml = data[id];
-             document.getElementById("inputText").innerHTML = innerHtml;
+                     document.getElementById("inputText").innerHTML = innerHtml;
                  }
 
 

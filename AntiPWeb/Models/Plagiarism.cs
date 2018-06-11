@@ -4,6 +4,7 @@ namespace AntiPShared
 {
     public class Plagiarism<TSourceId>
     {
+        public string DebugLogs { get; set; }
         public Dictionary<TSourceId, HashSet<int>> SourceIdToSourceWordsIndexes { get; set; } = new Dictionary<TSourceId, HashSet<int>>();
         public Dictionary<TSourceId, HashSet<int>> SourceIdToInitialWordsIndexes { get; set; } = new Dictionary<TSourceId, HashSet<int>>();
         public Dictionary<int, HashSet<TSourceId>> InitialWordIndexToSourceIds { get; set; } = new Dictionary<int, HashSet<TSourceId>>();

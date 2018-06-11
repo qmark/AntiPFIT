@@ -11,7 +11,7 @@ namespace AntiPShared
     {
         public static async Task<Plagiarism<string>> FindAsync(string serverMapPath, string[] initialWords, Dictionary<int, string> initialDocIndexToSimplifiedWord, int[] initialDocIndexes, string[] simplifiedWords, int wordCount)
         {
-            //return new Plagiarism<string>();
+            string debugStr="";
 
             var plagiarismWeb = new Plagiarism<string>();
 
@@ -34,7 +34,7 @@ namespace AntiPShared
             stopwatch.Restart();
             var urlsSimplifiedTexts = await WebManager.TextsAsync(mostPopularUrls);
             stopwatch.Stop();
-            Debug.WriteLine("WebManager.TextsAsync TIME " + stopwatch.ElapsedMilliseconds);
+            debugStr += "WebManager.TextsAsync TIME " + stopwatch.ElapsedMilliseconds + " ";
 
             stopwatch.Restart();
             var tasks = new Task<List<Plagiarism<string>>>[mostPopularUrls.Count];
@@ -93,13 +93,13 @@ namespace AntiPShared
                 }
             }
             stopwatch.Stop();
-            Debug.WriteLine("FIND WEB PLAGIARISM ON TOP URLS TIME " + stopwatch.ElapsedMilliseconds);
+           
 
             foreach (var kvp in plagiarismWeb.SourceIdToInitialWordsIndexes)
             {
                 plagiarismWeb.SourceIdToInitialDocumentHtml.Add(kvp.Key, TextManager.ComposeHtmlText(initialWords, kvp.Value));
             }
-
+            plagiarismWeb.DebugLogs = debugStr;
             return plagiarismWeb;
         }
 

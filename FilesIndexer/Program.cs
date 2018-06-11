@@ -113,16 +113,20 @@ namespace FilesIndexer
             //test = TextManager.SimplifyText(test).Replace("\r\n", " ");
             //AddWords(Logic.IndexingForDB(TextManager.WordsFromText(test).ToArray()), nameFile);
 
-
-
-            string fileName = "Пар 3-01 Інтеграл Ньютона-Лейбніца";
-            string initialText = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + fileName + ".doc");
-
-            AddDocument(fileName, initialText);
-
-            TextManager.PrepareText(initialText, out string[] initialWords, out Dictionary<int, string> initialDocIndexToSimplifiedWord, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount);
-            AddWords(Logic.IndexingForDB(initialDocIndexes, simplifiedWords), fileName);
-
+            string[] files = new string[5];
+            files[0] = "Пар 3-01 Інтеграл Ньютона-Лейбніца.doc";
+            files[1] = "LOL.docx";
+            files[2] = "GPK.docx";
+            files[3] = "Середа оцінювання адаптивних інтерфейсів користувачів.docx";
+            files[4] = "Документ для теста.docx";
+           // string fileName = "Пар 3-01 Інтеграл Ньютона-Лейбніца";
+            for (int i = 0; i < 5; i++)
+            {
+                string initialText = TextDocumentManager.TextFromFile(@"C:\Users\alex1\Desktop\" + files[i]);      
+                AddDocument(files[i], initialText);
+                TextManager.PrepareText(initialText, out string[] initialWords, out Dictionary<int, string> initialDocIndexToSimplifiedWord, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount);
+                AddWords(Logic.IndexingForDB(initialDocIndexes, simplifiedWords), files[i]);
+            }
 
 
 
@@ -144,7 +148,7 @@ namespace FilesIndexer
             //        str = "";
             //    }
             //}
-
+            Console.WriteLine("Ready");
             Console.ReadKey();
 
         }

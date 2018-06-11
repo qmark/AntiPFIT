@@ -116,7 +116,17 @@ textarea {
     margin-left: 50%;
 }
 
+.leftbar-stats {
+    padding-left:20px;
+    padding-right:20px;
+    padding-bottom:1px;
+    padding-top:11px;
+    background-color: white;
+    margin-top:5px;
+    margin-bottom:5px;
 
+
+}
 
 
 .leftbar {

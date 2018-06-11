@@ -3,15 +3,15 @@
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
 @{
-    ViewBag.Title = "Source";
+    ViewBag.Title = "Текст ресурсу з Веб-сторінки";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Source</h2>
+<h2>Текст ресурсу з Веб-сторінки</h2>
 
 <div class="container">
     <div class="wholebar row">
-        <div class="col-sm-8">
+        <div class="col-sm-12">
             <p class="leftbar" id="inputText">
                 @*@{
                         if (Model != null)
@@ -22,41 +22,7 @@
                 @Html.Raw(ViewBag.Text)
             </p>
         </div>
-        <div class=" col-sm-4">
-            <nav class="leftbar slidemenu">
-
-                <!-- Item 1 -->
-                <input type="radio" name="slideItem" id="slide-item-1" class="slide-toggle" checked />
-                <label for="slide-item-1"><i class="icon fas fa-search"></i><span>Search Engines</span></label>
-
-                <!-- Item 2 -->
-                <input type="radio" name="slideItem" id="slide-item-2" class="slide-toggle" />
-                <label for="slide-item-2"><i class="icon fas fa-database"></i><span>Local DB</span></label>
-
-                <!-- Item 3 -->
-                <input type="radio" name="slideItem" id="slide-item-3" class="slide-toggle" />
-                <label for="slide-item-3"><i class="icon fas fa-camera"></i><span>From picture</span></label>
-
-                <div class="clear"></div>
-
-                <!-- Bar -->
-                <div class="slider">
-                    <div class="bar"></div>
-                </div>
-                @*@if (Model != null)
-                    {
-                        <ul>
-
-                            @foreach (var x in @Model.PlagiarismDB.DocumentIdToDBWordsIndexes.Keys)
-                            {
-                                <li class="option" onclick="myFunction(@x)">
-                                    <span class="percent"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
-                                    <span class="reslink"> @x </span>
-                                </li>}
-                        </ul>
-                    }*@
-            </nav>
-        </div>
+      
 
     </div>
 </div>
