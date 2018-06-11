@@ -2,11 +2,11 @@
 using ReadSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Schedulers;
 
 namespace AntiPShared
 {
@@ -15,17 +15,17 @@ namespace AntiPShared
         #region Urls From Parsing
         public static Dictionary<string, List<int>> UrlsFromParsing(List<Shingle> shingles)
         {
-            var staScheduler = new StaTaskScheduler(numberOfThreads: 1); // МЕДЛЕННО, НО ДОЛЬШЕ БЕЗ КАПЧИ
+            //var staScheduler = new StaTaskScheduler(numberOfThreads: 1); // МЕДЛЕННО, НО ДОЛЬШЕ БЕЗ КАПЧИ
             //var staScheduler = new StaTaskScheduler(numberOfThreads: shingles.Count); // (В Ж)БАН ПРИЛЕТАЕТ СРАЗУ ЖЕ
             var tasks = new Task<(int, List<string>)>[shingles.Count];
             for (int i = 0; i < shingles.Count; i++)
             {
                 int j = i;
                 tasks[j] = Task<(int, List<string>)>.Factory.StartNew(() => FirstWordIndexAndUrls(shingles[j])
-                    , CancellationToken.None
-                    , TaskCreationOptions.None
-                    //, TaskScheduler.FromCurrentSynchronizationContext()
-                    , staScheduler
+                //, CancellationToken.None
+                //, TaskCreationOptions.None
+                ////, TaskScheduler.FromCurrentSynchronizationContext()
+                //, staScheduler
                 );
             }
 
@@ -163,23 +163,51 @@ namespace AntiPShared
             var webPagesTexts = new string[urlsCountCap];
             for (int i = 0; i < urlsCountCap; i++)
             {
-                webPagesTexts[i] = TextManager.SimplifyText(await HtmlToText(urls[i]));
+                webPagesTexts[i] = TextManager.SimplifyText(await HtmlToTextAsync(urls[i]));
             }
             return webPagesTexts;
         }
 
-        public static async Task<string[]> TextsAsync(int urlsCountCap, List<string> urls)
+        public static async Task<string[]> TextsAsync(List<string> urls, int urlsCountCap)
         {
-            var webPagesTexts = new string[urlsCountCap];
+            var tasks = new Task<string>[urlsCountCap];
             for (int i = 0; i < urlsCountCap; i++)
             {
-                webPagesTexts[i] = await HtmlToText(urls[i]);
+                tasks[i] = HtmlToTextAsync(urls[i]);
+            }
+
+            var allResults = await Task.WhenAll(tasks);
+
+            var webPagesTexts = new string[urlsCountCap];
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                webPagesTexts[i] = allResults[i];
             }
             return webPagesTexts;
         }
 
-        public static async Task<string> HtmlToText(string url)
+        public static async Task<string[]> TextsAsync(List<string> urls)
         {
+            var tasks = new Task<string>[urls.Count];
+            for (int i = 0; i < urls.Count; i++)
+            {
+                tasks[i] = HtmlToTextAsync(urls[i]);
+            }
+
+            var allResults = await Task.WhenAll(tasks);
+
+            var webPagesTexts = new string[urls.Count];
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                webPagesTexts[i] = allResults[i];
+            }
+            return webPagesTexts;
+        }
+
+        public static async Task<string> HtmlToTextAsync(string url)
+        {
+            Stopwatch allStopwatch = new Stopwatch();
+            allStopwatch.Start();
             Reader reader = new Reader();
             ReadOptions options = new ReadOptions
             {
@@ -188,10 +216,15 @@ namespace AntiPShared
 
             try
             {
+                Stopwatch readSharpStopwatch = new Stopwatch();
+                readSharpStopwatch.Start();
                 var article = await reader.Read(new Uri(url), options);
+                readSharpStopwatch.Stop();
                 var r = new Regex(@"<(.+?)>");
                 var r2 = new Regex(@"\s+");
                 string result = r2.Replace(r.Replace(article.Content, " "), " ");
+                allStopwatch.Stop();
+                Debug.WriteLine($"HTML READ FOR {url} ALL TIME: {allStopwatch.ElapsedMilliseconds} \t For Readsharp: {readSharpStopwatch.ElapsedMilliseconds} ");
                 return result;
             }
             catch (ReadException exc)

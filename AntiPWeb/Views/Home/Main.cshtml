@@ -5,7 +5,7 @@
 @*<h2>@ViewBag.Title.</h2>
     <h3>@ViewBag.Message</h3>*@
 @using AntiPShared
-@model AntiPShared.Plagiarism
+@model AntiPShared.PlagiarismResult
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
 
@@ -66,43 +66,43 @@
                 </div>
                 @if (Model != null)
                 {
-                    <hr />
-                    <div id="option-db">
-                        @foreach (var x in @Model.PlagiarismDB.DocumentIdToDBWordsIndexes.Keys)
-                        {
+                <hr />
+                <div id="option-db">
+                    @foreach (var x in @Model.PlagiarismDB.SourceIdToSourceWordsIndexes.Keys)
+                    {
 
-                            <div class="btn-group btn-group-justified db-search" role="group" aria-label="...">
-                                <div class="percent btn-group" role="group">
-                                    <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@{var lol = Math.Round(Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100, 2);} @lol %</button>
-                                </div>
-                                <div class="link-area btn-group" role="group">
-                                    <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@x</button>
-                                </div>
-                                <div class="view btn-group" role="group">
-                                    <button type="button" class="btn btn-default" onclick="openInNewWd('@Url.Action("SourceDB", "Home", new { id = x })')">Перегляд</button>
-                                </div>
-                            </div>
-
-                            @*<li>
-                                    <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
-                                    <span class="reslink" onclick="dbHighlight(@x)"> @x </span>
-                                    @*<button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>
-                                    <a href="@Url.Action("SourceDB", "Home", new { id = x })" target="_blank">View Link</a>
-
-                                </li>*@
-
-
-                                        }
+                    <div class="btn-group btn-group-justified db-search" role="group" aria-label="...">
+                        <div class="percent btn-group" role="group">
+                            <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@{var lol = Math.Round(Convert.ToDouble(Model.PlagiarismDB.DocumentIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100, 2);} @lol %</button>
+                        </div>
+                        <div class="link-area btn-group" role="group">
+                            <button type="button" class="btn btn-default" onclick="dbHighlight('@x')">@x</button>
+                        </div>
+                        <div class="view btn-group" role="group">
+                            <button type="button" class="btn btn-default" onclick="openInNewWd('@Url.Action(" SourceDB", "Home" , new { id=x })')">Перегляд</button>
+                        </div>
                     </div>
 
+                    @*<li>
+                          <span class="percent" onclick="dbHighlight(@x)"> @{var lol = Convert.ToDouble(Model.PlagiarismDB.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol  %</span>
+                        <span class="reslink" onclick="dbHighlight(@x)"> @x </span>
+                        @*<button class="view-link" onclick="location.href='@Url.Action(" Source", "Home" , new {id=@x})'">View Link</button>
+                        <a href="@Url.Action(" SourceDB", "Home" , new { id=x })" target="_blank">View Link</a>
+
+                    </li>*@
+
+
+                    }
+                </div>
 
 
 
 
-                    <div id="option-url">
 
-                        @foreach (var x in @Model.PlagiarismWeb.UrlToWebPageWordsIndexes.Keys)
-                        {
+                <div id="option-url">
+
+                    @foreach (var x in @Model.PlagiarismWeb.SourceIdToSourceWordsIndexes.Keys)
+                    {
 
 
 
@@ -120,15 +120,15 @@
 
 
                             @*<li class="option-url" style="position:absolute">
-                                    <span class="percent" onclick="webHighlight('@x')"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.UrlToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol %</span>
+                                  <span class="percent" onclick="webHighlight('@x')"> @{var lol = Convert.ToDouble(Model.PlagiarismWeb.SourceIdToInitialWordsIndexes[x].Count) / Convert.ToDouble(@Model.WordCount) * 100;} @lol %</span>
                                     <span class="reslink" onclick="webHighlight('@x')"> </span>
                                 //    <button class="view-link" onclick="location.href='@Url.Action("Source", "Home", new {id = @x})'">View Link</button>
                                     <a href="@Url.Action("SourceUrl", "Home", new { id = @HttpUtility.UrlEncode(x) })" target="_blank">View Link</a>
 
-                                </li>*@
+                    </li>*@
 
-                                        }
-                    </div>
+                    }
+                </div>
 
                     @*</ul>*@
                                         }

@@ -4,17 +4,18 @@ namespace AntiPShared
 {
     public class TextDocumentManager
     {
-        public static string SimplifiedTextFromFile(string fileName)
+        public static string SimplifiedTextFromFile(string path)
         {
             var doc = new Document();
-            doc.LoadFromFile(fileName);
+            doc.LoadFromFile(path);
 
-            return TextManager.SimplifyText(doc.GetText()).Replace("\r\n", " ");
+            return TextManager.SimplifyText(doc.GetText());
         }
-        public static string TextFromFile(string fileName)
+
+        public static string TextFromFile(string path)
         {
             var doc = new Document();
-            doc.LoadFromFile(fileName);
+            doc.LoadFromFile(path);
 
             return doc.GetText();
         }

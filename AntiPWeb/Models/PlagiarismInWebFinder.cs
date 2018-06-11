@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,106 +9,165 @@ namespace AntiPShared
 {
     public class PlagiarismInWebFinder
     {
-        public static async Task<PlagiarismInWebResult> Find(string serverMapPath, string[] initialWords, int[] initialDocIndexes, string[] simplifiedWords, int wordCount, double originalTextCharactersCount)
+        public static async Task<Plagiarism<string>> FindAsync(string serverMapPath, string[] initialWords, Dictionary<int, string> initialDocIndexToSimplifiedWord, int[] initialDocIndexes, string[] simplifiedWords, int wordCount)
         {
-            var plagiarismWeb = new PlagiarismWeb();
-            Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexes = new Dictionary<string, SortedSet<int>>();
+            //return new Plagiarism<string>();
 
-            //for (int i = 0; i <= initialDocIndexes.Length - Shingle.Lenght; i++)
-            //{
-            //    var query = Shingle.QueryFromWords(simplifiedWords, i);
-            //    var urlsForShingle = GoogleAPIManager.GetGoogleSearchResultsUrls(query);
+            var plagiarismWeb = new Plagiarism<string>();
 
-            //    var initialDocIndexesForShingle = new SortedSet<int>();
-            //    for (int j = 0; j < Shingle.Lenght; j++)
-            //    {
-            //        initialDocIndexesForShingle.Add(initialDocIndexes[i + j]);
-            //    }
+            Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
+            //Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexesSet = GetUrlToInitialDocWordsIndexesFromGoogleAPIParallel(initialDocIndexes, simplifiedWords);
+            //stopwatch.Stop();
+            //Debug.WriteLine("GSEARCH TIME " + stopwatch.ElapsedMilliseconds);
 
-            //    for (int k = 0; k < urlsForShingle.Count; k++)
-            //    {
-            //        if (urlToInitialDocWordsIndexes.TryGetValue(urlsForShingle[k], out SortedSet<int> initialDocWordsIndexes))
-            //        {
-            //            initialDocWordsIndexes.UnionWith(initialDocIndexesForShingle);
-            //        }
-            //        else
-            //        {
-            //            urlToInitialDocWordsIndexes.Add(urlsForShingle[k], initialDocIndexesForShingle);
-            //        }
-            //    }
-            //}
             var fileName = "serializedGS.txt";
             var path = Path.Combine(serverMapPath, fileName);
-            //var serializedGS = JsonConvert.SerializeObject(urlToInitialDocWordsIndexes);
+            //var serializedGS = JsonConvert.SerializeObject(urlToInitialDocWordsIndexesSet);
             //File.WriteAllText(path, serializedGS);
 
-            urlToInitialDocWordsIndexes = JsonConvert.DeserializeObject<Dictionary<string, SortedSet<int>>>(File.ReadAllText(path));
+            var urlToInitialDocWordsIndexesSet = JsonConvert.DeserializeObject<Dictionary<string, SortedSet<int>>>(File.ReadAllText(path));
+            var urlToInitialDocWordsIndexesList = urlToInitialDocWordsIndexesSet.ToDictionary(pair => pair.Key, pair => pair.Value.ToList());
 
-            //
-            var orderedUrlToInitialDocWordsIndexes = urlToInitialDocWordsIndexes.OrderByDescending(kvp => kvp.Value.Count).ToDictionary(pair => pair.Key, pair => pair.Value.ToList());
-            var orderedUrls = orderedUrlToInitialDocWordsIndexes.Keys.ToList();
+            var mostPopularUrls = GetMostPopularUrls(urlToInitialDocWordsIndexesSet);
 
-            var urlsCountCap = (int)Math.Ceiling(wordCount * 0.1);
-            var orderedUrlsSimplifiedTexts = await WebManager.TextsAsync(urlsCountCap, orderedUrls);
+            stopwatch.Restart();
+            var urlsSimplifiedTexts = await WebManager.TextsAsync(mostPopularUrls);
+            stopwatch.Stop();
+            Debug.WriteLine("WebManager.TextsAsync TIME " + stopwatch.ElapsedMilliseconds);
 
-            for (int i = 0; i < urlsCountCap; i++)
+            stopwatch.Restart();
+            var tasks = new Task<List<Plagiarism<string>>>[mostPopularUrls.Count];
+
+            for (int i = 0; i < mostPopularUrls.Count; i++)
             {
-                TextManager.PrepareText(orderedUrlsSimplifiedTexts[i], out string[] urlInitialWords, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out int urlWordCount);
-                var indexedUrlText = Logic.Indexing(urlSimplifiedWords);
-                var initialIndexesFoundOnUrl = orderedUrlToInitialDocWordsIndexes[orderedUrls[i]];
+                int savei = i;
 
-                for (int j = 0; j < Math.Min(initialIndexesFoundOnUrl.Count, urlSimplifiedWords.Length) - Shingle.Lenght; j++)
+                tasks[i] = Task<List<Plagiarism<string>>>.Factory.StartNew(() =>
                 {
-                    var urlTextWordsPositionsForShingle = TextComparer.FindWordsInIndexedText(Shingle.ListFromWords(urlSimplifiedWords, j), indexedUrlText);
+                    TextManager.PrepareText(urlsSimplifiedTexts[savei], out _, out _, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out _);
+                    var indexedUrlText = Logic.Indexing(urlInitialDocIndexes, urlSimplifiedWords);
+                    var initialDocIndexesFoundOnUrl = urlToInitialDocWordsIndexesList[mostPopularUrls[savei]];
 
-                    var initialDocIndexesForShingle = new List<int>();
-                    for (int k = 0; k < Shingle.Lenght; k++)
+                    var plagiarismWebs = new List<Plagiarism<string>>();
+                    for (int j = 0; j <= initialDocIndexesFoundOnUrl.Count - Shingle.Lenght; j++)
                     {
-                        initialDocIndexesForShingle.Add(initialIndexesFoundOnUrl[j + k]);
+                        List<string> wordsList = new List<string>();
+                        for (int k = 0; k < Shingle.Lenght; k++)
+                        {
+                            wordsList.Add(initialDocIndexToSimplifiedWord[initialDocIndexesFoundOnUrl[j + k]]);
+                        }
+
+                        var urlTextWordsPositionsForShingle = TextComparer.FindWordsInIndexedText(wordsList, indexedUrlText);
+                        if (urlTextWordsPositionsForShingle.Count == 0) continue;
+
+                        var initialDocIndexesForShingle = new List<int>();
+                        for (int k = 0; k < Shingle.Lenght; k++)
+                        {
+                            initialDocIndexesForShingle.Add(initialDocIndexesFoundOnUrl[j + k]);
+                        }
+
+                        var urlToWebPageWordsPositionsForShingle = new Dictionary<string, List<List<int>>>
+                        {
+                            { mostPopularUrls[savei], urlTextWordsPositionsForShingle }
+                        };
+
+                        var plagiarismWebForShingle = Logic.FindPlagiarism(urlToWebPageWordsPositionsForShingle, initialDocIndexesForShingle);
+                        plagiarismWebs.Add(plagiarismWebForShingle);
                     }
 
-                    var urlToWebPageWordsPositionsForShingle = new Dictionary<string, List<List<int>>>
-                    {
-                        { orderedUrls[i], urlTextWordsPositionsForShingle }
-                    };
+                    return plagiarismWebs;
+                });
+            }
 
-                    var plagiarismWebForShingle = Logic.FindPlagiarism(urlToWebPageWordsPositionsForShingle, initialDocIndexesForShingle);
-                    foreach (var kvp in plagiarismWebForShingle.UrlToWebPageWordsIndexes)
+            Task.WaitAll(tasks);
+
+            for (int i = 0; i < mostPopularUrls.Count; i++)
+            {
+                var plagiarismWebs = tasks[i].Result;
+
+                for (int j = 0; j < plagiarismWebs.Count; j++)
+                {
+                    var plagiarismWebForShingle = plagiarismWebs[j];
+                    plagiarismWeb.Add(plagiarismWebForShingle);
+                }
+            }
+            stopwatch.Stop();
+            Debug.WriteLine("FIND WEB PLAGIARISM ON TOP URLS TIME " + stopwatch.ElapsedMilliseconds);
+
+            foreach (var kvp in plagiarismWeb.SourceIdToInitialWordsIndexes)
+            {
+                plagiarismWeb.SourceIdToInitialDocumentHtml.Add(kvp.Key, TextManager.ComposeHtmlText(initialWords, kvp.Value));
+            }
+
+            return plagiarismWeb;
+        }
+
+        private static Dictionary<string, SortedSet<int>> GetUrlToInitialDocWordsIndexesFromGoogleAPIParallel(int[] initialDocIndexes, string[] simplifiedWords)
+        {
+            var shinglesCount = initialDocIndexes.Length - Shingle.Lenght;
+            var tasks = new Task<List<string>>[shinglesCount + 1];
+
+            for (int i = 0; i <= shinglesCount; i++)
+            {
+                var query = Shingle.QueryFromWords(simplifiedWords, i);
+                tasks[i] = Task<List<string>>.Factory.StartNew(() => GoogleAPIManager.GetGoogleSearchResultsUrls(query));
+            }
+
+            Task.WaitAll(tasks);
+
+            Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexes = new Dictionary<string, SortedSet<int>>();
+            for (int i = 0; i <= shinglesCount; i++)
+            {
+                var urlsForShingle = tasks[i].Result;
+
+                var initialDocIndexesForShingle = new SortedSet<int>();
+                for (int j = 0; j < Shingle.Lenght; j++)
+                {
+                    initialDocIndexesForShingle.Add(initialDocIndexes[i + j]);
+                }
+
+                for (int j = 0; j < urlsForShingle.Count; j++)
+                {
+                    if (urlToInitialDocWordsIndexes.TryGetValue(urlsForShingle[j], out SortedSet<int> initialDocWordsIndexes))
                     {
-                        if (plagiarismWeb.UrlToWebPageWordsIndexes.TryGetValue(kvp.Key, out HashSet<int> plagiarizedWebPageWordsIndexes))
-                        {
-                            plagiarizedWebPageWordsIndexes.UnionWith(kvp.Value);
-                            plagiarismWeb.UrlToInitialWordsIndexes[kvp.Key].UnionWith(plagiarismWebForShingle.UrlToInitialWordsIndexes[kvp.Key]);
-                        }
-                        else
-                        {
-                            plagiarismWeb.UrlToWebPageWordsIndexes.Add(kvp.Key, kvp.Value);
-                            plagiarismWeb.UrlToInitialWordsIndexes.Add(kvp.Key, plagiarismWebForShingle.UrlToInitialWordsIndexes[kvp.Key]);
-                        }
+                        initialDocWordsIndexes.UnionWith(initialDocIndexesForShingle);
                     }
-                    foreach (var kvp in plagiarismWebForShingle.InitialWordIndexToUrls)
+                    else
                     {
-                        if (plagiarismWeb.InitialWordIndexToUrls.TryGetValue(kvp.Key, out HashSet<string> sourceUrls))
-                        {
-                            sourceUrls.UnionWith(kvp.Value);
-                        }
-                        else
-                        {
-                            plagiarismWeb.InitialWordIndexToUrls.Add(kvp.Key, kvp.Value);
-                        }
+                        urlToInitialDocWordsIndexes.Add(urlsForShingle[j], new SortedSet<int>(initialDocIndexesForShingle));
                     }
                 }
             }
 
-            foreach (var kvp in plagiarismWeb.UrlToInitialWordsIndexes)
+            return urlToInitialDocWordsIndexes;
+        }
+
+        private static List<string> GetMostPopularUrls(Dictionary<string, SortedSet<int>> urlToInitialDocWordsIndexes)
+        {
+            Dictionary<int, (string url, int indexesCount)> initialDocWordIndexToMostPopularUrlAndIndexesCount = new Dictionary<int, (string url, int indexesCount)>();
+
+            foreach (var urlAndIndexes in urlToInitialDocWordsIndexes)
             {
-                plagiarismWeb.UrlToInitialDocumentHtml.Add(kvp.Key, TextManager.ComposeHtmlText(initialWords, kvp.Value));
+                foreach (var index in urlAndIndexes.Value)
+                {
+                    if (initialDocWordIndexToMostPopularUrlAndIndexesCount.TryGetValue(index, out (string url, int indexesCount) urlAndIndexesCount))
+                    {
+                        if (urlAndIndexes.Value.Count > urlAndIndexesCount.indexesCount)
+                        {
+                            initialDocWordIndexToMostPopularUrlAndIndexesCount[index] = (urlAndIndexes.Key, urlAndIndexes.Value.Count);
+                        }
+                    }
+                    else
+                    {
+                        initialDocWordIndexToMostPopularUrlAndIndexesCount.Add(index, (urlAndIndexes.Key, urlAndIndexes.Value.Count));
+                    }
+                }
             }
 
-            return new PlagiarismInWebResult
-            {
-                PlagiarismWeb = plagiarismWeb
-            };
+            const int MagicWordCap = 10;
+            return initialDocWordIndexToMostPopularUrlAndIndexesCount.Values.Where(x => x.indexesCount >= MagicWordCap).Select(x => x.url).Distinct().ToList();
         }
+
     }
 }

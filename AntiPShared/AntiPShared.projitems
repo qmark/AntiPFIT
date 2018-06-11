@@ -9,7 +9,6 @@
     <Import_RootNamespace>AntiPShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CheckResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GoogleAPIManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logic.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OCR.cs" />
@@ -26,6 +25,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TextDocumentManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TextManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UnidiffFormater.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebCheckResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WebManager.cs" />
   </ItemGroup>
 </Project>
