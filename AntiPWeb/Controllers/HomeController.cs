@@ -10,25 +10,6 @@ namespace AntiPWeb.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
-        }
-
         public ActionResult Main()
         {
             ViewBag.Message = "AntiP Main page.";
@@ -47,14 +28,7 @@ namespace AntiPWeb.Controllers
         }
         public ActionResult SourceDB(int id)
         {
-
-            //            plagiarismDB.DocumentIdToDBDocumentHtml.Add(kvp.Key, ComposeHtmlText(initialWords, plagiarismDB.DocumentIdToDBWordsIndexes[kvp.Key]));
-            //            initialWords->documentInDBWords
-            //PlagiarismInLocalDBFinder.ComposeHtmlText
-            //        клик на соурс -> грузим текст из соурса(бд/ урл) -> PlagiarismInLocalDBFinder.ComposeHtmlText(словаСоурса, индексыСловСоурса)->показываем результат как хтмл
-
             HashSet<int> docIndexes = Session["Doc" + id] as HashSet<int>;
-
 
             ViewBag.Text = TextManager.ComposeHtmlText(TextManager.WordsFromText(SQLLoader.GetDoc(id)).ToArray(), docIndexes);
             ViewBag.Message = "AntiP Main page.";
@@ -66,7 +40,6 @@ namespace AntiPWeb.Controllers
         [HttpPost]
         public async Task<ActionResult> Main(HttpPostedFileBase file)
         {
-
             if (file?.ContentLength > 0)
             {
                 var fileName = Path.GetFileName(file.FileName);
@@ -76,7 +49,7 @@ namespace AntiPWeb.Controllers
                 var initialText = TextDocumentManager.TextFromFile(path);
                 TextManager.PrepareText(initialText, out string[] initialWords, out Dictionary<int, string> initialDocIndexToSimplifiedWord, out int[] initialDocIndexes, out string[] simplifiedWords, out int wordCount);
 
-                var plagiarismInWebSearch = PlagiarismInWebFinder.FindAsync(Server.MapPath("~/App_Data/uploads"), initialWords, initialDocIndexToSimplifiedWord, initialDocIndexes, simplifiedWords, wordCount);
+                var plagiarismInWebSearch = PlagiarismInWebFinder.FindAsync(initialWords, initialDocIndexToSimplifiedWord, initialDocIndexes, simplifiedWords, Server.MapPath("~/App_Data/uploads"));
                 var plagiarismInLocalDBSearch = PlagiarismInLocalDBFinder.FindAsync(initialWords, initialDocIndexToSimplifiedWord, initialDocIndexes, simplifiedWords);
 
                 await Task.WhenAll(plagiarismInWebSearch, plagiarismInLocalDBSearch);
