@@ -38,18 +38,11 @@ namespace AntiPWeb.Controllers
 
         public async Task<ActionResult> SourceUrl(string id)
         {
-
-            //            plagiarismDB.DocumentIdToDBDocumentHtml.Add(kvp.Key, ComposeHtmlText(initialWords, plagiarismDB.DocumentIdToDBWordsIndexes[kvp.Key]));
-            //            initialWords->documentInDBWords
-            //PlagiarismInLocalDBFinder.ComposeHtmlText
-            //        клик на соурс -> грузим текст из соурса(бд/ урл) -> PlagiarismInLocalDBFinder.ComposeHtmlText(словаСоурса, индексыСловСоурса)->показываем результат как хтмл
-
             var webPageText = await WebManager.HtmlToTextAsync(@HttpUtility.UrlDecode(id));
             HashSet<int> docIndexes = Session[@HttpUtility.UrlDecode(id)] as HashSet<int>;
             TextManager.PrepareText(webPageText, out string[] urlInitialWords, out _, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out int urlWordCount);
             ViewBag.Text = TextManager.ComposeHtmlText(urlInitialWords, docIndexes);
-            ViewBag.Message = "AntiP Main page.";
-
+            ViewBag.Message = "Результат для веб-пошуку с сторінки" + id;
             return View();
         }
         public ActionResult SourceDB(int id)
