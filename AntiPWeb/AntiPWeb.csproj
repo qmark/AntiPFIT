@@ -240,10 +240,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Indexer.cs" />
     <Compile Include="Models\Plagiarism.cs" />
     <Compile Include="Models\TextAnalyzer.cs" />
     <Compile Include="Models\GoogleAPIManager.cs" />
-    <Compile Include="Models\Logic.cs" />
     <Compile Include="Models\PlagiarismResult.cs" />
     <Compile Include="Models\PlagiarismInLocalDBFinder.cs" />
     <Compile Include="Models\PlagiarismInWebFinder.cs" />
@@ -283,6 +283,8 @@
     <Content Include="x86\libtesseract304.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="ClassDiagram1.cd" />
+    <Content Include="ClassDiagram2.cd" />
     <None Include="Properties\PublishProfiles\AntiFit.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -306,9 +308,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Main.cshtml" />
     <Content Include="Views\Home\SourceDB.cshtml" />
     <Content Include="Views\Home\SourceUrl.cshtml" />
