@@ -24,6 +24,7 @@ namespace AntiPWeb.Controllers
             TextManager.PrepareText(webPageText, out string[] urlInitialWords, out _, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out int urlWordCount);
             ViewBag.Text = TextManager.ComposeHtmlText(urlInitialWords, docIndexes);
             ViewBag.Message = "Результат для веб-пошуку с сторінки" + id;
+            ViewBag.Id = id;
             return View();
         }
         public ActionResult SourceDB(int id)
