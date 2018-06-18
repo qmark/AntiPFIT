@@ -40,8 +40,10 @@ namespace AntiPWeb.Controllers
         [HttpPost]
         public async Task<ActionResult> Main(HttpPostedFileBase file)
         {
-            if (file?.ContentLength > 0)
+            
+            if (file?.ContentLength > 0 && (Path.GetFileName(file.FileName).Split('.')[1] == "doc" || Path.GetFileName(file.FileName).Split('.')[1] == "docx"))
             {
+                var types = file.ContentType;
                 var fileName = Path.GetFileName(file.FileName);
                 var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
                 file.SaveAs(path);
