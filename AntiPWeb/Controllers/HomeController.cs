@@ -23,8 +23,7 @@ namespace AntiPWeb.Controllers
             HashSet<int> docIndexes = Session[@HttpUtility.UrlDecode(id)] as HashSet<int>;
             TextManager.PrepareText(webPageText, out string[] urlInitialWords, out _, out int[] urlInitialDocIndexes, out string[] urlSimplifiedWords, out int urlWordCount);
             ViewBag.Text = TextManager.ComposeHtmlText(urlInitialWords, docIndexes);
-            ViewBag.Message = "AntiP Main page.";
-
+            ViewBag.Message = "Результат для веб-пошуку с сторінки" + id;
             return View();
         }
         public ActionResult SourceDB(int id)
@@ -41,8 +40,10 @@ namespace AntiPWeb.Controllers
         [HttpPost]
         public async Task<ActionResult> Main(HttpPostedFileBase file)
         {
-            if (file?.ContentLength > 0)
+            
+            if (file?.ContentLength > 0 && (Path.GetFileName(file.FileName).Split('.')[1] == "doc" || Path.GetFileName(file.FileName).Split('.')[1] == "docx"))
             {
+                var types = file.ContentType;
                 var fileName = Path.GetFileName(file.FileName);
                 var path = Path.Combine(Server.MapPath("~/App_Data/uploads"), fileName);
                 file.SaveAs(path);
